@@ -108,9 +108,9 @@ int main() {
 	for (i = 0; i < n_measures; i++) {
 		for (j = 0; j < n_skip; j++)
 			metropolis(lattice, l, beta, &accept);
-		printf("%d\t%f\t%f\n", i, energy(lattice, l), magnetization(lattice, l));
+		printf("%u\t%f\t%f\n", i, energy(lattice, l), magnetization(lattice, l));
 	}
-	printf("#Acceptance: %d out of %d (%f)\n", accept, n_measures*n_skip, ((float) accept) / (n_measures*n_skip));
+	printf("#Acceptance: %u out of %u (%f)\n", accept, n_measures*n_skip, ((float) accept) / (n_measures*n_skip));
 	ran2_save();
 	return 0;
 }
