@@ -8,7 +8,7 @@ def sample_var(data):
     return d
 
 def sample_std(data):
-    return np.sqrt(sample_var(data))
+    return data.std(ddof=1)
 
 def mean_var(data):
     return (sample_var(data) / np.size(data))
@@ -111,31 +111,17 @@ def tint(x):
     # returns an array, y[i] = tint integrated from 0 to i
     return np.cumsum(autocorr(x))
 
-def plot_tint(x):
-    # quick plot of tint(x) with matplotlib
-    plt.plot(tint(x))
-    plt.show()
-    
 def model_y2(neta):
     y = 0.5
     y += 1 / (np.exp(neta) - 1)
     return y
 
-def plot_therm_avg(x):
-    # thermalization analysis
-    avgs = []
-    for i in range(0, 10000):
-        avgs.append(x[i:].mean())
-    plt.plot(avgs)
-    plt.show()
-
-def error_therm_avg(x):
-    # thermalization analysis
-    avgs = []
-    for i in range(0, 10000):
-        avgs.append(x[i:].mean())
-    avgs = np.asarray(avgs)
-    return np.abs(avgs.max() - avgs.min())/2
+def thermal(f, data, xmax, step=10):
+    # Thermalization analysis of f(data) from 0 to xmax
+    measure = []
+    for i in range(0, xmax // step):
+        measure.append(f(data[step*i:]))
+    return np.asarray(measure)
 
 def rt1(x): 
     #round to 1st significant digit
