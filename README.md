@@ -1,5 +1,5 @@
 # Markov Chain Monte Carlo
-Implementation of Markov Chan Monte Carlo algorithms for Statistical Physics, Quantum Mechanics, QFT
+Implementation of Markov Chain Monte Carlo algorithms for Statistical Physics, Quantum Mechanics, QFT
 
 ## Contents
 - analysis/: (Python) Library for data analysis of autocorrelated data
@@ -10,3 +10,5 @@ Implementation of Markov Chan Monte Carlo algorithms for Statistical Physics, Qu
     - ising.c: C implementation
     - ising.cpp: C++ implementation
     - run.sh: Very simple launcher with GNU Parallel
+ 
+The random number generator ran2() (rng/ran2.c, rng/ran2_double.cpp) is not included due to licensing concerns.
