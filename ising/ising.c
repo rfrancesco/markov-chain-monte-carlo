@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "../ran2.c"
+#include "../rng/ran2.c"
 
 
 short random_spin() {

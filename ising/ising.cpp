@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "../ran2_double.cpp"
+#include "../rng/ran2_double.cpp"
 
 
 int random_spin() { 		// Genera casualmente \pm 1 con ran2
@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
 	if (argc != 7) {
 		std::cout << "Usage: 6 arguments: n_measures, n_skip, n, beta, extfield, init" << std::endl;
 		std::cout << "n_skip * N^2: metropolis steps between two measures" << std::endl;
-		std::cout << "init = (0: freddo, 1: caldo)" << std::endl;
+		std::cout << "init = (0: cold, 1: hot)" << std::endl;
 		return EXIT_FAILURE;
 	}
 
