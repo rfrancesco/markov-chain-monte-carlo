@@ -1,0 +1,103 @@
+\documentclass[10pt, a4paper, twocolumn]{article}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+
+\newcommand{\avg}[1]{\langle{#1}\rangle}
+
+\title{Simulazione numerica del modello di Ising 2D}
+\author{Rocco Francesco Basta}
+
+\begin{document}
+	\maketitle
+	\section{Introduzione}
+		Il modello di Ising 2D consiste in un reticolo di spin, ognuno dei quali può assumere un valore discreto $s_i = \pm 1$ ed interagisce con i suoi primi vicini e, eventualmente, con un campo magnetico esterno.
+
+		L'Hamiltoniana del sistema è data da
+
+		\begin{equation}
+			H = -J\sum_{<ij>} s_i s_j - h \sum_i s_i
+		\end{equation}
+
+		dove $J > 0$ è la costante di accoppiamento fra primi vicini, mentre $h$ è un campo magnetico esterno.
+
+		Possiamo definire la densità di magnetizzazione $M$, la densità di
+		energia $\epsilon$, la suscettività magnetica $\chi$ e il calore
+		specifico $C$ del sistema: sia $V$ il volume del reticolo,
+
+		\begin{subequations}
+		\begin{equation}
+			M \equiv \frac{1}{V} \sum_i s_i
+		\end{equation}
+		\begin{equation}
+			\epsilon \equiv \frac{E}{V}
+		\end{equation}
+		\begin{equation}
+			\chi \equiv \frac{\partial \avg{M}}{\partial h} \propto V ( \avg{M^2} - \avg{M}^2)
+		\end{equation}
+		\begin{equation}
+			C \equiv \frac{\partial \avg{\epsilon}}{\partial T} \propto V (\avg{\epsilon^2} - \avg{\epsilon}^2)
+		\end{equation}
+
+		\end{subequations}
+
+		Il modello presenta una transizione di fase del secondo ordine per
+		$\beta_c \equiv 1/T_{c} \simeq 0.4407$. Attorno al punto critico, la lunghezza di
+		correlazione $\xi$ diverge, e il comportamento del sistema è descritto
+		dagli esponenti critici $\alpha, \beta, \gamma, \nu$. Definendo la temperatura ridotta $t \equiv \beta - \beta_c$,
+
+		\begin{subequations}
+		\begin{equation}
+			\xi \sim |t|^{-\nu} 
+		\end{equation}
+		\begin{equation}
+			\avg{M} \sim |t|^\beta \quad (T < T_c) 
+		\end{equation}
+		\begin{equation}
+			\chi \sim |t|^{-\gamma}
+		\end{equation}
+		\begin{equation}
+			C \sim |t|^{-\alpha}
+		\end{equation}
+		\end{subequations}
+
+		Gli esponenti critici sono noti esattamente: $\nu = 1$, $\beta = 1/8$,
+		$\gamma = 7/4$, $\alpha = 0$.
+
+		Per volumi finiti, $\xi$ non può divergere e diventa confrontabile
+		con $L$. Assumendo che nell'intorno della transizione il sistema perda
+		memoria del comportamento microscopico (e quindi della spaziatura del
+		reticolo),
+		si ottiengono delle relazioni di scaling per $\avg{M}$, $\chi$ e $C$:
+
+		\begin{subequations}
+		  \begin{equation}
+			\chi(\beta, L) = L^{\gamma/\nu} f(tL^{1/\nu})
+		  \end{equation}
+		\end{subequations}
+
+	\section{Metodologia}
+
+	La transizione è stata studiata attraverso un algoritmo Metropolis per
+	reticoli di dimensione $L = 20,30,40,50,60$, con $\beta$ compreso tra 0.3 e
+	0.505. Per ogni coppia $(L, \beta )$,
+	sono state prese $10^{6}$ misure, ognuna ogni $100 \cdot L^{2}$ singoli passi
+	di update, partendo da un reticolo di spin orientati casualmente. Questa
+	scelta della configurazione iniziale non è necessariamente la migliore, ma
+	una diversa scelta influirebbe solo in un diverso tempo di termalizzazione
+	del sistema.
+
+	La simulazione è stata effettuata in assenza di campo magnetico esterno
+	($h = 0$), e fissando $J = 1$.
+
+	Gli errori su $\avg{\epsilon}$ e $\avg{M}$ sono stati
+	stimati attraverso un processo di blocking, mentre gli errori su $\chi$ e $C$ sono stati stimati attraverso un algoritmo Bootstrap.
+
+	Il generatore di numeri casuali utilizzato è RAN2 (W. H. Press, S. A.
+	Teutolsky, W. T. Vetterling, B. P. Flannery, \emph{Numerical Recipes, Third Edition}).
+
+
+
+\end{document}

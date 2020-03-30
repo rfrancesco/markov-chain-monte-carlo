@@ -10,5 +10,6 @@ Implementation of Markov Chain Monte Carlo algorithms for Statistical Physics, Q
     - ising.c: C implementation
     - ising.cpp: C++ implementation
     - run.sh: Very simple launcher with GNU Parallel
+    - relazione/: Report (Italian)
  
 The random number generator ran2() (rng/ran2.c, rng/ran2_double.cpp) is not included due to licensing concerns.
