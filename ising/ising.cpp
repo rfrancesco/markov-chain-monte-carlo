@@ -51,13 +51,13 @@ Lattice::Lattice(unsigned int n, int init) {
 	if (n != 0) {
 		// Alloco la matrice
 		matrix = new int*[n];
-		for (int i = 0; i < n; i++)
+		for (unsigned int i = 0; i < n; i++)
 			matrix[i] = new int[n];
 		// Alloco la matrice interna delle condizioni al bordo
 		geometry = new unsigned int*[2];
 		geometry[0] = new unsigned int[n];
 		geometry[1] = new unsigned int[n];
-		for (int i = 0; i < n; i++) {
+		for (unsigned int i = 0; i < n; i++) {
 			geometry[0][i] = i + 1;
 			geometry[1][i] = i - 1;
 		}
@@ -68,13 +68,13 @@ Lattice::Lattice(unsigned int n, int init) {
 	// Andrebbe spostato in Simulation, ma funziona uguale
 	// Magari ci lascio un parametro qui in futuro, per riciclare il codice
 	switch (init) {
-		case 0:		for (int i = 0; i < n; i++)
-					for (int j = 0; j < n; j++)
+		case 0:		for (unsigned int i = 0; i < n; i++)
+					for (unsigned int j = 0; j < n; j++)
 						matrix[i][j] = 1;
 				std::cout << "#Lattice initialized with 1\n";
 				break;
-		case 1: 	for (int i = 0; i < n; i++)
-					for (int j = 0; j < n; j++)
+		case 1: 	for (unsigned int i = 0; i < n; i++)
+					for (unsigned int j = 0; j < n; j++)
 						matrix[i][j] = random_spin();
 				std::cout << "#Lattice initialized with random spins\n";
 				break;
@@ -87,7 +87,7 @@ Lattice::Lattice(unsigned int n, int init) {
 Lattice::~Lattice() {
 	// Distruttore dell'oggetto Lattice
 	// Dealloca la matrice
-	for (int i = 0; i < size; i++)
+	for (unsigned int i = 0; i < size; i++)
 		delete [] matrix[i];
 	delete [] matrix;
 	// Dealloco la matrice interna delle condizioni al bordo
@@ -166,8 +166,8 @@ void Simulation::Metrostep() {
 double Simulation::Energy() const {
 	double e = 0;
 	double f;
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
+	for (unsigned int i = 0; i < size; i++) {
+		for (unsigned int j = 0; j < size; j++) {
 			f = (*l)(i, l->p1(j)) + (*l)(i, l->m1(j)) + (*l)(l->p1(i), j) + (*l)(l->m1(i), j);
 			e -= 0.5*f*(*l)(i,j);
 			e -= extfield*(*l)(i,j);	
@@ -179,8 +179,8 @@ double Simulation::Energy() const {
 
 double Simulation::Magnetization() const {
 	double m = 0;
-	for (int i = 0; i < size; i++)
-		for (int j = 0; j < size; j++) 
+	for (unsigned int i = 0; i < size; i++)
+		for (unsigned int j = 0; j < size; j++)
 			m += (*l)(i,j);
 	m /= volume;
 	return m;
