@@ -14,6 +14,8 @@ short random_spin() {
 
 typedef struct lattice_s {
 	short ** matrix;
+    unsigned int * next;
+    unsigned int * prev;
 	unsigned int size;
 } lattice_t;
 
@@ -29,21 +31,33 @@ short ** create_matrix(unsigned int l) {
 lattice_t * create_lattice(unsigned int l) {
 	lattice_t * lat = malloc(sizeof(lattice_t));
 	lat->matrix = create_matrix(l);
-	if (lat->matrix == NULL) {
-		free(lat);
-		return NULL;
-	}
-	else {
-		lat->size = l;
-		return lat;
-	}
+	lat->size = l;
+    lat->next = malloc(l*sizeof(unsigned int));
+    lat->prev = malloc(l*sizeof(unsigned int));
+    for (unsigned int i = 0; i < l; i++) {
+        lat->next[i] = i+1;
+        lat->prev[i] = i-1;
+    }
+    lat->next[l-1] = 0;
+    lat->prev[0] = l-1;
+	return lat;
 }
 
-void initialize_lattice(lattice_t * lat) {
+void initialize_lattice(lattice_t * lat, unsigned int init) {
 	unsigned int i, j;
-	for (i = 0; i < lat->size; i++)
-		for (j = 0; j < lat->size; j++)
-			lat->matrix[i][j] = random_spin();
+    switch (init) {
+        case 0:	for (i = 0; i < lat->size; i++)
+                    for (j = 0; j < lat->size; j++)
+                        lat->matrix[i][j] = 1;
+                printf("#Lattice initialized with 1\n");
+                break;
+        case 1:	for (i = 0; i < lat->size; i++)
+                    for (j = 0; j < lat->size; j++)
+                        lat->matrix[i][j] = random_spin();
+                printf("#Lattice initialized with random spins\n");
+                break;
+        default: exit(EXIT_FAILURE);
+    }
 }
 
 /*void printf_matrix(short ** lattice, unsigned int l) {
@@ -60,31 +74,36 @@ int mod(int a, int b) {		// C % is remainder, not modulus
 	return r < 0 ? r + b : r;
 }
 
-double energy_neighbors(lattice_t * lat, unsigned int i, unsigned int j) {
+double force(lattice_t * lat, unsigned int i, unsigned int j) {
 	// Using mod() is convenient but wastes time (~15%)
 	// A lookup table would be a more efficient approach (see ising.cpp)
 	double e = 0;
-	e += lat->matrix[mod(i+1, lat->size)][j];
-	e += lat->matrix[mod(i-1, lat->size)][j];
-	e += lat->matrix[i][mod(j+1, lat->size)];
-	e += lat->matrix[i][mod(j-1, lat->size)];
-	e *= - lat->matrix[i][j];
+	e += lat->matrix[lat->next[i]][j];
+	e += lat->matrix[i][lat->next[j]];
+	e += lat->matrix[lat->prev[i]][j];
+	e += lat->matrix[i][lat->prev[j]];
 	return e;
 }
 
-void metropolis(lattice_t * lat, double beta, unsigned int * accepted) {
+void metropolis(lattice_t * lat, double beta, double extfield, unsigned int * accepted) {
 	unsigned int i, j;
 	double x;
 	i = floor(ran2() * lat->size);
 	j = floor(ran2() * lat->size);
 
 	double p;
-	p = exp(2 * beta * energy_neighbors(lat, i, j));
-	x = ran2();
-	if (x < p) {
-		lat->matrix[i][j] *= -1;
-		(*accepted)++;
-	}
+	p = exp(- 2 * beta * lat->matrix[i][j] * (force(lat, i, j) + extfield));
+    if (p > 1) {
+        lat->matrix[i][j] *= -1;
+        (*accepted)++;
+    } 
+    else {
+    	x = ran2();
+        if (x < p) {
+            lat->matrix[i][j] *= -1;
+            (*accepted)++;
+        }
+    }
 }
 
 double energy(lattice_t * lat) {
@@ -92,7 +111,7 @@ double energy(lattice_t * lat) {
 	unsigned int i,j;
 	for (i = 0; i < lat->size; i++)
 		for (j = 0; j < lat->size; j++)
-			e += energy_neighbors(lat, i, j);
+			e -= lat->matrix[i][j]*force(lat, i, j);
 	e /= 2;
 	e /= pow(lat->size,2);
 	return e;
@@ -108,17 +127,27 @@ double magnetization(lattice_t * lat) {
 	return m;
 }
 
-int main() {
+int main(int argc, char** argv) {
 
+    if (argc != 7) {
+        printf("Usage: n_measures, n_skip, L, beta, extfield, init (0: cold, 1: hot)\n");
+        return EXIT_FAILURE;
+    }
+           
 	ran2_init();
-	double beta = 0.3;
-	unsigned int l = 10;
-	unsigned int n_measures = 100000;
-	unsigned int n_skip = 100;
+	unsigned int n_measures = atoi(argv[1]);
+	unsigned int n_skip = atoi(argv[2]);
+	unsigned int l = atoi(argv[3]);
+	double beta = atof(argv[4]);
+    double extfield = atof(argv[5]);
+    unsigned int init = atoi(argv[6]);
+    printf("#Beginning simulation: L = %u, beta = %f, extfield = %f\n", l, beta, extfield);
+    printf("#%u measures every %u sweeps\n", n_measures, n_skip);
+    
 
 	n_skip *= l * l;
 	lattice_t * lattice = create_lattice(l);
-	initialize_lattice(lattice);
+	initialize_lattice(lattice, init);
 
 	//printf_matrix(lattice, l);	
 	
@@ -129,7 +158,7 @@ int main() {
 	printf("#Energy\tMagnetization\n");
 	for (i = 0; i < n_measures; i++) {
 		for (j = 0; j < n_skip; j++)
-			metropolis(lattice, beta, &accept);
+			metropolis(lattice, beta, extfield, &accept);
 		printf("%f\t%f\n", energy(lattice), magnetization(lattice));
 	}
 	printf("#Acceptance: %u out of %u (%f)\n", accept, n_measures*n_skip, ((float) accept) / (n_measures*n_skip));
