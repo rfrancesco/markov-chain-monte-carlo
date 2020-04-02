@@ -31,10 +31,11 @@ short ** create_matrix(unsigned int l) {
     if (!matrix)
         ungracefully_handle_memory_issues();
     unsigned int i;
-    for (i = 0; i < l; i++)
+    for (i = 0; i < l; i++) {
         matrix[i] = malloc(l * sizeof(short));
         if (!matrix[i])
             ungracefully_handle_memory_issues();
+    }
     return matrix;
 }
 
