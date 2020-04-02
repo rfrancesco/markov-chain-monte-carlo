@@ -4,6 +4,7 @@
 #include "../rng/ran2.c"
 
 
+
 short random_spin() {
     double x = ran2();
     if (x > 0.5)
@@ -19,12 +20,21 @@ typedef struct lattice_s {
     unsigned int size;
 } lattice_t;
 
+void ungracefully_handle_memory_issues() {
+    printf("Fatal error: Memory allocation failure.\n");
+    fprintf(stderr, "Fatal error: Memory allocation failure.\n");
+    exit(EXIT_FAILURE);
+}
 
 short ** create_matrix(unsigned int l) {
     short ** matrix = malloc(l * sizeof(short*));
+    if (!matrix)
+        ungracefully_handle_memory_issues();
     unsigned int i;
     for (i = 0; i < l; i++)
         matrix[i] = malloc(l * sizeof(short));
+        if (!matrix[i])
+            ungracefully_handle_memory_issues();
     return matrix;
 }
 
@@ -34,7 +44,9 @@ lattice_t * create_lattice(unsigned int l) {
     lat->size = l;
     lat->next = malloc(l*sizeof(unsigned int));
     lat->prev = malloc(l*sizeof(unsigned int));
-    for (unsigned int i = 0; i < l; i++) {
+    if (!lat->prev || !lat->next)
+        ungracefully_handle_memory_issues();
+    for (unsigned int i = 0; i < lat->size; i++) {
         lat->next[i] = i+1;
         lat->prev[i] = i-1;
     }
@@ -56,7 +68,9 @@ void initialize_lattice(lattice_t * lat, unsigned int init) {
                         lat->matrix[i][j] = random_spin();
                 printf("#Lattice initialized with random spins\n");
                 break;
-        default: exit(EXIT_FAILURE);
+        default:    printf("Fatal error: Illegal value for init\n");
+                    fprintf(stderr, "Fatal error: Illegal value for init\n");
+                    exit(EXIT_FAILURE);
     }
 }
 
@@ -144,7 +158,7 @@ int main(int argc, char** argv) {
     printf("#Beginning simulation: L = %u, beta = %f, extfield = %f\n", l, beta, extfield);
     printf("#%u measures every %u sweeps\n", n_measures, n_skip);
     
-
+    // n_skip is measured in sweeps
     n_skip *= l * l;
     lattice_t * lattice = create_lattice(l);
     initialize_lattice(lattice, init);
@@ -152,16 +166,16 @@ int main(int argc, char** argv) {
     //printf_matrix(lattice, l);	
     
     unsigned int i, j;
-    unsigned int accept = 0; 	// accettanza (da normalizzare)
+    unsigned int accepted = 0; 	// counts accepted steps 
 
 
     printf("#Energy\tMagnetization\n");
     for (i = 0; i < n_measures; i++) {
         for (j = 0; j < n_skip; j++)
-            metropolis(lattice, beta, extfield, &accept);
+            metropolis(lattice, beta, extfield, &accepted);
         printf("%f\t%f\n", energy(lattice), magnetization(lattice));
     }
-    printf("#Acceptance: %u out of %u (%f)\n", accept, n_measures*n_skip, ((float) accept) / (n_measures*n_skip));
+    printf("#Acceptance: %u out of %u (%f)\n", accepted, n_measures*n_skip, ((float) accepted) / (n_measures*n_skip));
     ran2_save();
     return 0;
 }
