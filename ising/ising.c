@@ -66,6 +66,7 @@ void free_lattice(lattice_t * lat) {
     free(lat->next);
     free(lat->prev);
     free_matrix(lat->matrix, lat->size);
+    free(lat);
 }
 
 void initialize_lattice(lattice_t * lat, unsigned int init) {
