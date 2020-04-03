@@ -39,6 +39,12 @@ short ** create_matrix(unsigned int l) {
     return matrix;
 }
 
+void free_matrix(short ** matrix, unsigned int l) {
+    for (unsigned int i = 0; i < l; i++)
+        free(matrix[i]);
+    free(matrix);
+}
+
 lattice_t * create_lattice(unsigned int l) {
     lattice_t * lat = malloc(sizeof(lattice_t));
     lat->matrix = create_matrix(l);
@@ -54,6 +60,12 @@ lattice_t * create_lattice(unsigned int l) {
     lat->next[l-1] = 0;
     lat->prev[0] = l-1;
     return lat;
+}
+
+void free_lattice(lattice_t * lat) {
+    free(lat->next);
+    free(lat->prev);
+    free_matrix(lat->matrix, lat->size);
 }
 
 void initialize_lattice(lattice_t * lat, unsigned int init) {
@@ -178,5 +190,6 @@ int main(int argc, char** argv) {
     }
     printf("#Acceptance: %u out of %u (%f)\n", accepted, n_measures*n_skip, ((float) accepted) / (n_measures*n_skip));
     ran2_save();
+    free_lattice(lattice);
     return 0;
 }
