@@ -115,18 +115,16 @@ double force(lattice_t * lat, unsigned int i, unsigned int j) {
 
 void metropolis(lattice_t * lat, double beta, double extfield, unsigned int * accepted) {
     unsigned int i, j;
-    double x;
     i = floor(ran2() * lat->size);
     j = floor(ran2() * lat->size);
 
-    double p;
-    p = exp(- 2 * beta * lat->matrix[i][j] * (force(lat, i, j) + extfield));
+    double p = exp(- 2 * beta * lat->matrix[i][j] * (force(lat, i, j) + extfield));
     if (p > 1) {
         lat->matrix[i][j] *= -1;
         (*accepted)++;
     } 
     else {
-        x = ran2();
+        double x = ran2();
         if (x < p) {
             lat->matrix[i][j] *= -1;
             (*accepted)++;
