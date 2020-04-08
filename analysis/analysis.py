@@ -62,6 +62,7 @@ def bootstrap_var(data, blocksize, n_samples):
     # Let us create an array of blocks we can choose from
     blocks = x.reshape(nblocks, blocksize)
     # This is a matrix. Each row is a sample, each element is a block (index)
+    # !!! THIS OPERATION IS EXTREMELY RAM INTENSIVE !!!
     choices = np.random.randint(0, nblocks, size=(n_samples, nblocks))
     # Now let us replace each index with the block it refers to
     # And let us concatenate all blocks of each sample
@@ -73,11 +74,34 @@ def bootstrap_var(data, blocksize, n_samples):
     return f_std
 
 
-def xfbootstrap_var_blocking(data, n_samples):
+def bootstrap_var_lessram(data, blocksize, n_samples):
+    '''Calculates the statistical error (std) on the variance of
+    a 1D array with the Bootstrap algorithm.'''
+    x = np.copy(data)
+    ndata = x.size
+    ndiscard = ndata % blocksize
+    if ndiscard > 0:
+        x = x[ndiscard:]
+    # In how many blocks of size blocksize can we divide our array?
+    nblocks = int(ndata // blocksize)
+    # Let us create an array of blocks we can choose from
+    blocks = x.reshape(nblocks, blocksize)
+    f_samples = np.empty(n_samples)
+    for i in range(n_samples):
+        choices = np.random.randint(0, nblocks, size=nblocks)
+        sample = blocks[choices].flatten()
+        f_samples[i] = (sample.var(ddof=1))
+    # Now, axis 0 picks the sample while axis 1 goes along each sample
+    # We can calculate the variance
+    f_samples = np.array(f_samples)
+    f_std = f_samples.std(ddof=1)
+    return f_std
+
+def bootstrap_var_blocking(data, n_samples):
     # reblocking analysis for data with autocorrelation
     x = np.copy(data)
     b_max = int(np.log2(x.size))
-    b = [bootstrap_var(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
+    b = [bootstrap_var_lessram(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
     return np.asarray(b)
 
 
