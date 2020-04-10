@@ -3,18 +3,21 @@ Implementation of Markov Chain Monte Carlo algorithms for Statistical Physics,
 Quantum Mechanics, QFT (work in progress)
 
 ## Contents
-- analysis/ 
+- analysis/  
   (Python) Library for data analysis of autocorrelated data
     - analysis.py: Blocking and Bootstrap algorithm with binning with Numpy 
     - linefit_library.py: Simple analytical linear fit (algorithm from A. G. Frodesen, O.
    Skjeggestad, H. Tøfte, Probability and Statistics in Particle Physics)
-- gaussian/
+- gaussian/  
   (C) Gaussian number generator based on the Metropolis algorithm
   - gauss.c: C implementation
-- ising/ 
+- ising/   
   (C/C++) 2D Ising model simulation (Metropolis algorithm)
     - ising.c: C implementation
     - ising.cpp: C++ implementation
     - run.sh: Very simple launcher with GNU Parallel
+- qm/  
+  (C) QM simulations
+    - harmonic.c: Quantum harmonic oscillator
 
 The random number generator ran2() (rng/ran2.c, rng/ran2_double.cpp) is not included due to licensing concerns.
