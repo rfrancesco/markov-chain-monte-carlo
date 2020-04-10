@@ -9,12 +9,16 @@ from numba import njit
 
 @njit
 def var(data):
+    '''Numba-friendly shorthand for np.var(data, ddof=1).'''
     n = data.size
     return data.var() * n/(n-1)
 
+
 @njit
 def std(data):
+    '''Numba-friendly shorthand for np.std(data, ddof=1).'''
     return np.sqrt(var(data))
+
 
 @njit
 def halve(data):
@@ -28,6 +32,7 @@ def halve(data):
         s -= 1
     s = s // 2
     return w.reshape(s, 2).sum(axis=1) / 2
+
 
 @njit
 def blocking(data):
@@ -61,32 +66,8 @@ def binder(data):
     return d
 
 
-def bootstrap_var(data, blocksize, n_samples):
-    '''Calculates the statistical error (std) on the variance of
-    a 1D array with the Bootstrap algorithm.'''
-    x = np.copy(data)
-    ndata = x.size
-    ndiscard = ndata % blocksize
-    if ndiscard > 0:
-        x = x[ndiscard:]
-    # In how many blocks of size blocksize can we divide our array?
-    nblocks = int(ndata // blocksize)
-    # Let us create an array of blocks we can choose from
-    blocks = x.reshape(nblocks, blocksize)
-    # This is a matrix. Each row is a sample, each element is a block (index)
-    # !!! THIS OPERATION IS EXTREMELY RAM INTENSIVE !!!
-    choices = np.random.randint(0, nblocks, size=(n_samples, nblocks))
-    # Now let us replace each index with the block it refers to
-    # And let us concatenate all blocks of each sample
-    samples = blocks[choices].reshape(n_samples, nblocks*blocksize)
-    # Now, axis 0 picks the sample while axis 1 goes along each sample
-    # We can calculate the variance
-    f_samples = samples.var(axis=1, ddof=1)
-    f_std = f_samples.std(ddof=1)
-    return f_std
-
 @njit
-def bootstrap_var_lessram(data, blocksize, n_samples):
+def bootstrap_var(data, blocksize, n_samples):
     '''Calculates the statistical error (std) on the variance of
     a 1D array with the Bootstrap algorithm.'''
     x = np.copy(data)
@@ -110,14 +91,18 @@ def bootstrap_var_lessram(data, blocksize, n_samples):
 
 
 def bootstrap_var_blocking(data, n_samples):
+    '''Calculates the statistical error (std) on the variance of
+    a 1D array of autocorrelated data, with the Bootstrap algorithm
+    with blocks of increasing size'''
     # reblocking analysis for data with autocorrelation
     x = np.copy(data)
     b_max = int(np.log2(x.size))
-    b = [bootstrap_var_lessram(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
+    b = [bootstrap_var(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
     return np.asarray(b)
 
+
 def autocorr(data):
-    # returns statistical autocorrelation function of a 1D array
+    '''Returns statistical autocorrelation of a 1D array'''
     x = data.copy()
     x = x - x.mean()
     aut = np.correlate(x, x, mode='full')
@@ -126,8 +111,8 @@ def autocorr(data):
 
 
 def tint(data):
-    # integrated autocorrelation time
-    # returns an array, y[i] = tint integrated from 0 to i
+    '''Estimate of autocorrelation time. Returns integrated
+    autocorrelation time tau_int, integrated from 0 to i.'''
     return np.cumsum(autocorr(data))
 
 
