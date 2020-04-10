@@ -2,8 +2,21 @@ import numpy as np
 import random as ran
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from numba import njit
 
+# Numba does not support arguments in np.var(), np.std()
+# Therefore, var() and std() are equivalent to np.var(ddof=1) and np.std(ddof=1)
 
+@njit
+def var(data):
+    n = data.size
+    return data.var() * n/(n-1)
+
+@njit
+def std(data):
+    return np.sqrt(var(data))
+
+@njit
 def halve(data):
     '''halve(numpy.ndarray 1D x): (x[i]) -> (y[i] = (x[2i] + x[2i+1])/2)
     y.size = x.size // 2
@@ -13,21 +26,20 @@ def halve(data):
     if (s % 2) != 0:
         w = w[1:]
         s -= 1
-    s /= 2
-    s = int(s)
+    s = s // 2
     return w.reshape(s, 2).sum(axis=1) / 2
 
-
+@njit
 def blocking(data):
     '''Blocking analysis for data with autocorrelation
     Estimator for the standard deviation of the mean'''
-    b = []
     x = np.copy(data)
-    b.append(x.std(ddof=1) / np.sqrt(x.size))
-    for i in range(0, int(np.log2(data.size)) - 1):
+    b_max = np.log2(data.size)
+    b = np.empty(b_max)
+    for i in range(b_max):
+        b[i] = std(x) / np.sqrt(x.size)
         x = halve(x)
-        b.append(x.std(ddof=1) / np.sqrt(x.size))
-    return np.asarray(b)
+    return b 
 
 
 def plotblocking(data):
@@ -73,7 +85,7 @@ def bootstrap_var(data, blocksize, n_samples):
     f_std = f_samples.std(ddof=1)
     return f_std
 
-
+@njit
 def bootstrap_var_lessram(data, blocksize, n_samples):
     '''Calculates the statistical error (std) on the variance of
     a 1D array with the Bootstrap algorithm.'''
@@ -90,12 +102,12 @@ def bootstrap_var_lessram(data, blocksize, n_samples):
     for i in range(n_samples):
         choices = np.random.randint(0, nblocks, size=nblocks)
         sample = blocks[choices].flatten()
-        f_samples[i] = (sample.var(ddof=1))
+        f_samples[i] = var(sample)
     # Now, axis 0 picks the sample while axis 1 goes along each sample
     # We can calculate the variance
-    f_samples = np.array(f_samples)
-    f_std = f_samples.std(ddof=1)
+    f_std = std(f_samples)
     return f_std
+
 
 def bootstrap_var_blocking(data, n_samples):
     # reblocking analysis for data with autocorrelation
@@ -103,7 +115,6 @@ def bootstrap_var_blocking(data, n_samples):
     b_max = int(np.log2(x.size))
     b = [bootstrap_var_lessram(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
     return np.asarray(b)
-
 
 def autocorr(data):
     # returns statistical autocorrelation function of a 1D array
@@ -118,12 +129,6 @@ def tint(data):
     # integrated autocorrelation time
     # returns an array, y[i] = tint integrated from 0 to i
     return np.cumsum(autocorr(data))
-
-
-def model_y2(neta):
-    y = 0.5
-    y += 1 / (np.exp(neta) - 1)
-    return y
 
 
 def thermal(f, data, xmax, step=10, **kwargs):
