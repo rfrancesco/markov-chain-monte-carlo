@@ -39,7 +39,7 @@ def blocking(data):
     '''Blocking analysis for data with autocorrelation
     Estimator for the standard deviation of the mean'''
     x = np.copy(data)
-    b_max = np.log2(data.size)
+    b_max = int(np.log2(data.size))
     b = np.empty(b_max)
     for i in range(b_max):
         b[i] = std(x) / np.sqrt(x.size)
