@@ -128,18 +128,18 @@ def thermal(f, data, xmax, step=10, **kwargs):
             measure.append(f(data[step*i:], *params))
     return np.asarray(measure)
 
+def order(x):
+    '''Gets order of magnitude exponent of x (x ~ 10**order(x))'''
+    return int(np.floor(np.log10(x)))
 
 def rt1(x):
-    # round to 1st significant digit
-    return round(x, -int(np.floor(np.log10(abs(x)))))
+    '''Rounds x to the first significant digit'''
+    return round(x, - order(x))
 
+def rtn(x, n):
+    '''Rounds x to the nth significant digit'''
+    return round(x, - order(x) + (n - 1))
 
-def rte(x, dx):
-    # round error to measurement's 1st significant digit
-    return round(x, -int(np.floor(np.log10(abs(dx)))))
-
-
-def r_measurement(x, dx):
-    # rounds measurement to error, assuming that error should be rounded to 1st significant digit
-    # do not use indiscriminately
-    return (rte(x,dx), rt1(dx))
+def rwe(x, dx, n):
+    '''Rounds (x \pm dx) to nth significant digit of dx.'''
+    return (round(x, -order(dx)+(n-1)), round(dx, -order(dx)+(n-1)))
