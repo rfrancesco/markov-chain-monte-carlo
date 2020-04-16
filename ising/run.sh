@@ -5,16 +5,16 @@
 
 BINARY=xising
 N_JOBS=3				# number of concurrent jobs
-NS=20					# simulation parameters
-BETAS=$(echo 0.{350..500..5}) 		 
-N_MEASURES=1000000			 
+NS=100					# simulation parameters
+BETAS=$(echo 0.{435..450..1}) 		 
+N_MEASURES=125000			 
 N_SKIP=1
-INIT="0 1"
+INIT="0"
 LOGFILE=log				# log start/finish to file - TODO: do this with parallel directly 
 OUT_NAME="{3}/{1}/ising_{2}"            # output filename string
 ARG="./$BINARY $N_MEASURES $N_SKIP {1} {2} 0 {3} ::: $NS ::: $BETAS ::: ${INIT}"	# Command string
 
-if [ $1 = 'dry-run' ]; then
+if [ "$1" == 'dry-run' ]; then
 	parallel --dry-run $ARG
 	exit 0
 fi
