@@ -113,7 +113,7 @@ double force(lattice_t * lat, unsigned int i, unsigned int j) {
     return e;
 }
 
-void metropolis(lattice_t * lat, double beta, double extfield, unsigned int * accepted) {
+void metropolis(lattice_t * lat, double beta, double extfield, unsigned long int * accepted) {
     unsigned int i, j;
     i = floor(ran2() * lat->size);
     j = floor(ran2() * lat->size);
@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
     //printf_matrix(lattice, l);	
     
     unsigned int i, j;
-    unsigned int accepted = 0; 	// counts accepted steps 
+    unsigned long int accepted = 0; 	// counts accepted steps 
 
 
     printf("#Energy\tMagnetization\n");
