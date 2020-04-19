@@ -26,14 +26,12 @@ betas = np.array([float(strbeta) for strbeta in strbetas])
 
 def getblocks(strbeta):
     e, m = np.loadtxt(f'{init}/{N}/ising_{strbeta}', unpack=True)
-    e = e[-100000:]
-    m = m[-100000:]
     print(f'Read {N}/ising_{strbeta}')
     m = np.abs(m)
     eblock = bootstrap_var_blocking(e, n_samples)
     mblock = bootstrap_var_blocking(m, n_samples)
     print(f'{strbeta} -> eblock = {eblock}, mblock = {mblock}')
-    blocks = np.concatenate(([float(strbeta)], eblock, mblock))
+    blocks = np.concatenate(([float(strbeta)], [e.var(ddof=1)], [m.var(ddof=1)],  eblock, mblock))
     return blocks
 
-np.savetxt(f'bootstrap/{N}', np.vstack([getblocks(strbeta) for strbeta in tqdm(strbetas)]))
+np.savetxt(f'bootstrap_raw/{N}', np.vstack([getblocks(strbeta) for strbeta in tqdm(strbetas)]))
