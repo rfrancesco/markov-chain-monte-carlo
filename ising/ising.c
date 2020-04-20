@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
             metropolis(lattice, beta, extfield, &accepted);
         printf("%f\t%f\n", energy(lattice), magnetization(lattice));
     }
-    printf("#Acceptance: %u out of %u (%f)\n", accepted, n_measures*n_skip, ((float) accepted) / (n_measures*n_skip));
+    printf("#Acceptance: %lu out of %lu (%f)\n", accepted, n_measures*n_skip, ((float) accepted) / (n_measures*n_skip));
     ran2_save();
     free_lattice(lattice);
     return 0;
