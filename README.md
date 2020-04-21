@@ -19,5 +19,7 @@ Quantum Mechanics, QFT (work in progress)
 - qm/  
   (C) QM simulations
     - harmonic.c: Quantum harmonic oscillator
-
+    - circle.cpp: Quantum free particle on a circle (S1)
+        - s1.hpp/cpp: C++ data type implementing the circle group S1
+        
 The random number generator ran2() (rng/ran2.c, rng/ran2_double.cpp) is not included due to licensing concerns.
