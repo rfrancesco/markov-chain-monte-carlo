@@ -81,17 +81,14 @@ class Path {
     public:
         Path(unsigned int);
         ~Path();
-        // outside access, not very useful though
         const S1& operator[] (unsigned int) const;
         S1& operator[] (unsigned int);
-
-        // p1, m1 = increments/decrements an index
-        // implementing the boundary conditions on the Path
         unsigned int p1(unsigned int) const;
         unsigned int m1(unsigned int) const;
         void print() const;
-        double winding() const;  // calculates winding number
+        double winding() const;
         int MetropolisSweep(double, double);
+        int TailorStep(double);
 };
 
 double Path::winding() const {
@@ -175,6 +172,52 @@ int Path::MetropolisSweep(double eta, double delta) {
     return accepted;
 }
 
+int Path::TailorStep(double eta) {
+    //cout << "Attempting tailor (" << winding() << ")...";
+    //unsigned int start = floor(size * ran2());
+    unsigned int start = 0;
+    unsigned int stop = p1(start);
+    bool found = false;
+    while (!found && stop < (size - 1))  {
+        if (std::abs(p[stop] - p[start] - 0.5) < 0.2*eta) {
+            found = true;
+        } else {
+            stop = p1(stop);
+        }
+    }
+
+    if (found) {
+        // Metropolis test
+        S1 stop_p (2*p[start] - p[stop]);
+        double dS = pow(p[p1(stop)] - stop_p, 2);
+        dS -= pow(p[p1(stop)] - p[stop],2);
+        dS /= 2*eta;
+
+        double r = exp(-dS);
+
+        if (r > 1) {
+            unsigned int i = start;
+            while (i != stop) {
+                i = p1(i);
+                p[i] = 2*p[start] - p[i];
+            }
+            return 1;
+        }
+        else {
+            double x = ran2();
+            if (x < r) {
+                unsigned int i = start;
+                while (i != stop) {
+                    i = p1(i);
+                    p[i] = 2*p[start] - p[i];
+                }
+                return 1;
+            }
+        }
+    }
+    //cout << "failed" << endl;
+    return 0;
+}
 
 int main(int argc, char** argv) {
 
@@ -184,29 +227,40 @@ int main(int argc, char** argv) {
     }
 
     ran2_init();
-    const double Neta = atof(argv[1]);// è essenzialmente la temperatura: Nη = β/mR^2
+    const double Neta = atof(argv[1]);   // è essenzialmente la temperatura: Nη = β/mR^2
     const unsigned int N = atoi(argv[2]);
     const double eta = Neta/N;
     const unsigned long int n_measures = atoi(argv[3]);
     const unsigned long int n_skip = atoi(argv[4]);
 
-    const double delta = sqrt(eta);//sqrt(eta);
+    const double delta = sqrt(eta);
 
-    unsigned long int accepted = 0;
+    unsigned long int m_accepted = 0; // local metropolis acceptance counter
+    unsigned long int t_accepted = 0; // nonlocal tailor move acceptance counter
 
-    cout << "#Simulation with Νη = β/mR^2 = " << Neta << ", η = " << eta << ", N = " << N << endl;
-    cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps" << endl;
-    cout << "#Local Metropolis algorithm with delta = " << delta << endl;
+    cout << "#Simulation with Νη = β/mL^2 = " << Neta << ", η = " << eta << ", N = " << N << endl;
+    cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps + nonlocal move" << endl;
+    cout << "#Local Metropolis algorithm (delta = " << delta << " ) + nonlocal tailor move each sweep" << endl;
 
     Path* p = new Path(N);
 
     for (unsigned int i = 0; i < n_measures; ++i) {
-        for (unsigned int j = 0; j < n_skip; ++j)
-            accepted += p->MetropolisSweep(eta, delta);
+        for (unsigned int j = 0; j < n_skip; ++j) {
+            m_accepted += p->MetropolisSweep(eta, delta);
+            t_accepted += p->TailorStep(eta);
+        }
         p->print();
     }
 
-    cout << "#Acceptance: " << accepted << " out of " << N*n_measures*n_skip << " (" << static_cast<double>(accepted)/(N*n_measures*n_skip) << ")" << endl;
+    const unsigned long int m_steps = n_measures*N*n_skip;
+    const unsigned long int t_steps = n_measures*n_skip;
+    const unsigned long int tot_steps = m_steps + t_steps;
+    const unsigned long int tot_accepted = m_accepted + t_accepted;
+
+
+    cout << "#Local Metropolis acceptance: " << m_accepted << " out of " << m_steps << " (" << static_cast<double>(m_accepted)/m_steps << ")" << endl;
+    cout << "#Nonlocal move acceptance: " << t_accepted << " out of " << t_steps << " (" << static_cast<double>(t_accepted)/t_steps << ")" << endl;
+    cout << "#Total acceptance: " << tot_accepted << " out of " << tot_steps << " (" << static_cast<double>(tot_accepted)/tot_steps << ")" << endl;
 
     ran2_save();
     return 0;

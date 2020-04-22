@@ -16,3 +16,8 @@ circle.o: circle.cpp
 circle: circle.o s1.o
 	$(CPP) -o xcircle circle.o s1.o
 
+circle2.o : circle2.cpp
+	$(CPP) $(CPPARGS) -c circle2.cpp
+
+circle2: circle2.o s1.o
+	$(CPP) -o xtailor circle2.o s1.o
