@@ -7,9 +7,11 @@
     - [x] Measure correlation functions <x(0)x(τ)>
     
     
-- circle.cpp: Free particle on a 1D circle with simple local Metropolis algorithm. 
+- circle.cpp: Free particle on a 1D circle with simple local Metropolis
+algorithm. __ 
   This algorithm is not ideal, as it presents an exponential critical slowing down for η -> 0 (issues with ergodicity)
-- circle2.cpp: Free particle on a 1D circle with local Metropolis + nonlocal "Tailor" move
+- circle2.cpp: Free particle on a 1D circle with local Metropolis + nonlocal
+  "Tailor" move __
   Reference: C. Bonati, M. D'Elia, _Topological critical slowing down:
     Variations on a toy model_, Phys. Rev. E 98, 013308 (2018)
 
