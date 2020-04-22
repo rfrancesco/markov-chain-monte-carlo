@@ -8,10 +8,10 @@
     
     
 - circle.cpp: Free particle on a 1D circle with simple local Metropolis
-algorithm. __ 
+algorithm.   
   This algorithm is not ideal, as it presents an exponential critical slowing down for η -> 0 (issues with ergodicity)
 - circle2.cpp: Free particle on a 1D circle with local Metropolis + nonlocal
-  "Tailor" move __
+  "Tailor" move  
   Reference: C. Bonati, M. D'Elia, _Topological critical slowing down:
     Variations on a toy model_, Phys. Rev. E 98, 013308 (2018)
 
