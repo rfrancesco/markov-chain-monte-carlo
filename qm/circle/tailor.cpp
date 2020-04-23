@@ -5,7 +5,7 @@ using std::endl;
 #include <cmath>
 
 #include "s1.hpp"
-#include "../rng/ran2_double.cpp"
+#include "../../rng/ran2_double.cpp"
 
 const double PI2 = pow(M_PI, 2);
 

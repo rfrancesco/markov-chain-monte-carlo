@@ -7,8 +7,8 @@ s1.o: s1.cpp
 local.o: local.cpp
 	$(CPP) $(CPPARGS) -c local.cpp
 
-circle: circle.o s1.o
-	$(CPP) -o xcircle local.o s1.o
+local: local.o s1.o
+	$(CPP) -o xlocal local.o s1.o
 
 tailor.o : tailor.cpp
 	$(CPP) $(CPPARGS) -c tailor.cpp

@@ -5,7 +5,7 @@ using std::endl;
 #include <cmath>
 
 #include "s1.hpp"
-#include "../rng/ran2_double.cpp"
+#include "../../rng/ran2_double.cpp"
 
 const double PI2 = pow(M_PI, 2);
 
@@ -190,11 +190,11 @@ int main(int argc, char** argv) {
     const unsigned long int n_measures = atoi(argv[3]);
     const unsigned long int n_skip = atoi(argv[4]);
 
-    const double delta = sqrt(eta);//sqrt(eta);
+    const double delta = 0.5; //sqrt(eta);
 
     unsigned long int accepted = 0;
 
-    cout << "#Simulation with Νη = β/mR^2 = " << Neta << ", η = " << eta << ", N = " << N << endl;
+    cout << "#Simulation with Νη = β/mL^2 = " << Neta << ", η = " << eta << ", N = " << N << endl;
     cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps" << endl;
     cout << "#Local Metropolis algorithm with delta = " << delta << endl;
 
