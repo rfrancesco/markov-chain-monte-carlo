@@ -86,10 +86,60 @@ class Path {
         unsigned int p1(unsigned int) const;
         unsigned int m1(unsigned int) const;
         void print() const;
+        // Observables
         double winding() const;
+        double cos_avg() const;
+        double cos_correlator(unsigned int) const;
+        double cos2_avg() const;
+        double cos2_correlator(unsigned int) const;
+        // Markov steps
         int MetropolisSweep(double, double);
         int TailorStep(double);
 };
+
+double Path::cos_avg() const {
+    double result = 0;
+    // Calculate <x^2> as average over entire path
+    for (unsigned int i = 0; i < size; ++i)
+        result += cos(2*M_PI*p[i]);
+    result /= size;
+    return result;
+}
+
+double Path::cos_correlator(unsigned int k) const {
+    double result = 0;
+    // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
+    for (unsigned int i = 0; i < size; ++i) {
+        unsigned int ik = i;
+        for (unsigned int j = 0; j < k; ++j)
+            ik = p1(ik);
+        result += cos(2*M_PI*p[ik])*cos(2*M_PI*p[i]);
+    }
+    result /= size;
+    return result;
+}
+
+double Path::cos2_avg() const {
+    double result = 0;
+    // Calculate <x^2> as average over entire path
+    for (unsigned int i = 0; i < size; ++i)
+        result += cos(4*M_PI*p[i]);
+    result /= size;
+    return result;
+}
+
+double Path::cos2_correlator(unsigned int k) const {
+    double result = 0;
+    // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
+    for (unsigned int i = 0; i < size; ++i) {
+        unsigned int ik = i;
+        for (unsigned int j = 0; j < k; ++j)
+            ik = p1(ik);
+        result += cos(4*M_PI*p[ik])*cos(4*M_PI*p[i]);
+    }
+    result /= size;
+    return result;
+}
 
 double Path::winding() const {
     double q = 0;
@@ -123,7 +173,14 @@ Path::~Path() {
 }
 
 void Path::print() const {
-    printf("%.3f\n", winding());
+    printf("%.3f\t", winding());
+    double cos_avg2 = pow(cos_avg(),2);
+    for (unsigned int i = 0; i < size; i++)
+        cout << cos_correlator(i) - cos_avg2 << "\t"; // connected correlator
+    double cos2_avg2 = pow(cos2_avg(),2);
+    for (unsigned int i = 0; i < size; i++)
+        cout << cos2_correlator(i) - cos2_avg2 << "\t"; // connected correlator
+    cout << '\n';
 }
 
 
@@ -227,13 +284,13 @@ int main(int argc, char** argv) {
     }
 
     ran2_init();
-    const double Neta = atof(argv[1]);   // è essenzialmente la temperatura: Nη = β/mR^2
+    const double Neta = atof(argv[1]);   // è essenzialmente la temperatura: Nη = β/mL^2
     const unsigned int N = atoi(argv[2]);
     const double eta = Neta/N;
     const unsigned long int n_measures = atoi(argv[3]);
     const unsigned long int n_skip = atoi(argv[4]);
 
-    const double delta = sqrt(eta);
+    const double delta = sqrt(eta);// 0.5; //sqrt(eta);
 
     unsigned long int m_accepted = 0; // local metropolis acceptance counter
     unsigned long int t_accepted = 0; // nonlocal tailor move acceptance counter
@@ -241,6 +298,13 @@ int main(int argc, char** argv) {
     cout << "#Simulation with Νη = β/mL^2 = " << Neta << ", η = " << eta << ", N = " << N << endl;
     cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps + nonlocal move" << endl;
     cout << "#Local Metropolis algorithm (delta = " << delta << " ) + nonlocal tailor move each sweep" << endl;
+    cout << "#C1(τ) = <cos(2πτ)cos(0)>_c, C2(τ) = <cos(4πτ)cos(0)>_c" << endl;
+    cout << "#Q\t";
+    for (unsigned int i = 0; i < N; ++i)
+        cout << "C1(" << i << ")\t";
+    for (unsigned int i = 0; i < N; ++i)
+        cout << "C2(" << i << ")\t";
+    cout << endl;
 
     Path* p = new Path(N);
 
