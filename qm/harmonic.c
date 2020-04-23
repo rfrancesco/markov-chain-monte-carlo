@@ -42,10 +42,20 @@ void print_path(path_t * path) {
 
 // In C, % non implementa il modulo => workaround
 // Da sostituire con lookup
-int mod(int a, int b) {
+unsigned int mod(int a, int b) {
 	int r = a % b;
 	return r < 0 ? r + b : r;
 }
+
+// Correlatore <x(0)x(τ)>
+double x_corr(path_t * path, unsigned int k) {
+	double c = 0;
+	for (unsigned int i = 0; i < path->len; i++)
+		c += path->p[i] * path->p[mod(i+k, path->len)];
+	c /= path->len;
+	return c;
+}
+
 
 void metropolis(path_t * path, double eta, double delta, unsigned int *accepted) {
 	for (unsigned int i = 0; i < path->len; i++) { 			//spazza il cammino, rispetta il bilancio dettagliato
@@ -85,8 +95,8 @@ double dx2(path_t * path) {
 
 
 int main(int argc, char *argv[]) {
-	if (argc == 1) {
-		printf("Syntax is %s [N*eta] [N] [delta] \n", argv[0]);
+	if (argc < 4) {
+		printf("Syntax is %s [N*eta] [N] [n_measures] [n_skip] \n", argv[0]);
 	    	return EXIT_FAILURE;
 	}	
 	ran2_init();
@@ -95,19 +105,22 @@ int main(int argc, char *argv[]) {
 	unsigned int N = atoi(argv[2]);
 	double eta = Neta / N;
 	printf("#Beginning simulation with Neta = %f, N = %u, eta = %f\n", Neta, N, eta);
-	unsigned int n_measures = 10000000;
-	unsigned int n_skip = 10;
+	unsigned int n_measures = atoi(argv[3]);
+	unsigned int n_skip = atoi(argv[4]);
 	unsigned int accept = 0;
-	//double delta = 2* sqrt(eta);
-	double delta = atof(argv[3]);
+	double delta = sqrt(eta);
+	//double delta = atof(argv[3]);
 	path_t * path = create_path(N);
 	initialize_path(path);
 
-	printf("#y^2\tdy^2\n");
+	printf("#y^2\tdy^2\t<x(τ)x(0)>\n");
 	for (unsigned int i = 0; i < n_measures; i++) {
 		for (unsigned int j = 0; j < n_skip; j++)
 			metropolis(path, eta, delta, &accept);
-		printf("%f\t%f\n", x2(path), dx2(path));
+		printf("%f\t%f\t", x2(path), dx2(path));
+		for (unsigned int t = 0; t < path->len; t++)
+			printf("%f\t", x_corr(path, t));
+		printf("\n");
 	}
 
 	printf("#Acceptance: %u out of %u (%f)\n", accept, n_measures*n_skip*N, ((float) accept) / (n_measures*n_skip*N));
