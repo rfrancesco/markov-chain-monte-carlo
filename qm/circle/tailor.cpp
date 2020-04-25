@@ -85,7 +85,7 @@ class Path {
         S1& operator[] (unsigned int);
         unsigned int p1(unsigned int) const;
         unsigned int m1(unsigned int) const;
-        void print() const;
+        void print(double) const;
         // Observables
         double winding() const;
         double cos_avg() const;
@@ -172,13 +172,13 @@ Path::~Path() {
     delete [] p;
 }
 
-void Path::print() const {
+void Path::print(double Neta) const {
     printf("%.3f\t", winding());
     double cos_avg2 = pow(cos_avg(),2);
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size/(2*Neta); i++)
         cout << cos_correlator(i) - cos_avg2 << "\t"; // connected correlator
     double cos2_avg2 = pow(cos2_avg(),2);
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size/(2*Neta); i++)
         cout << cos2_correlator(i) - cos2_avg2 << "\t"; // connected correlator
     cout << '\n';
 }
@@ -313,7 +313,7 @@ int main(int argc, char** argv) {
             m_accepted += p->MetropolisSweep(eta, delta);
             t_accepted += p->TailorStep(eta);
         }
-        p->print();
+        p->print(Neta);
     }
 
     const unsigned long int m_steps = n_measures*N*n_skip;
