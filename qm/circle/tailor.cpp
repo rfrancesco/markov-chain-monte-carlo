@@ -108,12 +108,14 @@ double Path::cos_avg() const {
 
 double Path::cos_correlator(unsigned int k) const {
     double result = 0;
+    unsigned int i = 0;
+    unsigned int ik = 0;
+    for (unsigned int j = 0; j < k; ++j)
+        ik = p1(ik);
     // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
-    for (unsigned int i = 0; i < size; ++i) {
-        unsigned int ik = i;
-        for (unsigned int j = 0; j < k; ++j)
-            ik = p1(ik);
+    for (i = 0; i < size; ++i) {
         result += cos(2*M_PI*p[ik])*cos(2*M_PI*p[i]);
+        ik = p1(ik);
     }
     result /= size;
     return result;
@@ -130,12 +132,14 @@ double Path::cos2_avg() const {
 
 double Path::cos2_correlator(unsigned int k) const {
     double result = 0;
+    unsigned int i = 0;
+    unsigned int ik = 0;
+    for (unsigned int j = 0; j < k; ++j)
+        ik = p1(ik);
     // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
-    for (unsigned int i = 0; i < size; ++i) {
-        unsigned int ik = i;
-        for (unsigned int j = 0; j < k; ++j)
-            ik = p1(ik);
+    for (i = 0; i < size; ++i) {
         result += cos(4*M_PI*p[ik])*cos(4*M_PI*p[i]);
+        ik = p1(ik);
     }
     result /= size;
     return result;
