@@ -4,7 +4,7 @@ CPPARGS=-O2 -march=native -std=c++17 -Wpedantic
 s1.o: s1.cpp
 	$(CPP) $(CPPARGS) -c s1.cpp 
 
-pathsim.o: pathsim.o
+pathsim.o: pathsim.cpp
 	$(CPP) $(CPPARGS) -c pathsim.cpp
 
 local.o: local.cpp
