@@ -3,9 +3,11 @@ using std::cin;
 using std::cout;
 using std::endl;
 #include <cmath>
+#include <random>
 
 #include "s1.hpp"
-#include "../../rng/ran2_double.cpp"
+#include "../../rng/ran.hpp"
+#include "pathsim.hpp"
 
 const double PI2 = pow(M_PI, 2);
 
@@ -69,112 +71,13 @@ const double PI2 = pow(M_PI, 2);
  *  La moltiplicazione non ha un significato intrinseco in S1, e la distanza non gode di questa proprietà.
  *  */
 
+// Let us initialize our RNG with a random seed
+// This is not good if you want to _know_ the state of the RNG
+// but it is certainly better than saving/loading from a file,
+// which could ruin parallel simulations
 
-
-
-
-class Path {
-    private:
-        S1 * p;
-        unsigned int size;
-        unsigned int **geometry;
-    public:
-        Path(unsigned int);
-        ~Path();
-        // outside access, not very useful though
-        const S1& operator[] (unsigned int) const;
-        S1& operator[] (unsigned int);
-
-        // p1, m1 = increments/decrements an index
-        // implementing the boundary conditions on the Path
-        unsigned int p1(unsigned int) const;
-        unsigned int m1(unsigned int) const;
-        void print() const;
-        double winding() const;  // calculates winding number
-        int MetropolisSweep(double, double);
-};
-
-double Path::winding() const {
-    double q = 0;
-    for (unsigned int i = 0; i < size; i++)
-        q += p[p1(i)] - p[i];
-    return q;
-}
-
-
-Path::Path(unsigned int s) {
-    p = new S1[s];
-    // Alloco la matrice interna delle condizioni al bordo
-    geometry = new unsigned int*[2];
-    geometry[0] = new unsigned int[s];
-    geometry[1] = new unsigned int[s];
-    for (unsigned int i = 0; i < s; i++) {
-        geometry[0][i] = i + 1;
-        geometry[1][i] = i - 1;
-    }
-    geometry[0][s-1] = 0;
-    geometry[1][0] = s - 1;
-    size = s;
-    for (unsigned int i = 0; i < size; i++)
-        p[i] = ran2();
-}
-
-Path::~Path() {
-    delete [] geometry[0];
-    delete [] geometry[1];
-    delete [] p;
-}
-
-void Path::print() const {
-    printf("%.3f\n", winding());
-}
-
-
-unsigned int Path::p1(unsigned int i) const {
-    return geometry[0][i];
-}
-
-unsigned int Path::m1(unsigned int i) const {
-    return geometry[1][i];
-}
-
-const S1& Path::operator[](unsigned int i) const {
-    return p[i];
-}
-
-S1& Path::operator[](unsigned int i) {
-    return p[i];
-}
-
-int Path::MetropolisSweep(double eta, double delta) {
-    unsigned int accepted = 0;
-    for (unsigned int i = 0; i < size; i++) {
-        double x = delta*(2*ran2() - 1);
-        S1 yp = p[i] + x;
-
-        double dS = pow( p[p1(i)] - yp , 2);
-        dS += pow(yp - p[m1(i)], 2);
-        dS -= pow(p[p1(i)] - p[i],2);
-        dS -= pow(p[i] - p[m1(i)],2);
-        dS /= 2*eta;
-
-        double r = exp(-dS);
-
-        if (r > 1) {
-            p[i] = yp;
-            ++accepted;
-        }
-        else {
-            x = ran2();
-            if (x < r) {
-                p[i] = yp;
-                ++accepted;
-            }
-        }
-    }
-    return accepted;
-}
-
+std::random_device urandom("/dev/urandom");
+Ran ran(urandom());
 
 int main(int argc, char** argv) {
 
@@ -183,14 +86,13 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    ran2_init();
-    const double Neta = atof(argv[1]);// è essenzialmente la temperatura: Nη = β/mR^2
+    const double Neta = atof(argv[1]); // è essenzialmente la temperatura: Nη = β/mL^2
     const unsigned int N = atoi(argv[2]);
     const double eta = Neta/N;
     const unsigned long int n_measures = atoi(argv[3]);
     const unsigned long int n_skip = atoi(argv[4]);
 
-    const double delta = 0.5; //sqrt(eta);
+    const double delta = 0.5;
 
     unsigned long int accepted = 0;
 
@@ -198,16 +100,17 @@ int main(int argc, char** argv) {
     cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps" << endl;
     cout << "#Local Metropolis algorithm with delta = " << delta << endl;
 
-    Path* p = new Path(N);
+    PathSim* p = new PathSim(N);
 
     for (unsigned int i = 0; i < n_measures; ++i) {
+        // Metropolis steps
         for (unsigned int j = 0; j < n_skip; ++j)
             accepted += p->MetropolisSweep(eta, delta);
-        p->print();
+        // Print measures
+        printf("%.3f\n", p->winding());
     }
 
     cout << "#Acceptance: " << accepted << " out of " << N*n_measures*n_skip << " (" << static_cast<double>(accepted)/(N*n_measures*n_skip) << ")" << endl;
 
-    ran2_save();
     return 0;
 }

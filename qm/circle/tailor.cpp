@@ -3,9 +3,11 @@ using std::cin;
 using std::cout;
 using std::endl;
 #include <cmath>
+#include <random>
 
 #include "s1.hpp"
-#include "../../rng/ran2_double.cpp"
+#include "../../rng/ran.hpp"
+#include "pathsim.hpp"
 
 const double PI2 = pow(M_PI, 2);
 
@@ -69,216 +71,13 @@ const double PI2 = pow(M_PI, 2);
  *  La moltiplicazione non ha un significato intrinseco in S1, e la distanza non gode di questa proprietà.
  *  */
 
+// Let us initialize our RNG with a random seed
+// Using <ctime> time(NULL); would not be enough, as simulations
+// that are run in parallel with GNU Parallel could have the same seed
 
+std::random_device urandom("/dev/urandom");
+Ran ran(urandom());
 
-
-
-class Path {
-    private:
-        S1 * p;
-        unsigned int size;
-        unsigned int **geometry;
-    public:
-        Path(unsigned int);
-        ~Path();
-        const S1& operator[] (unsigned int) const;
-        S1& operator[] (unsigned int);
-        unsigned int p1(unsigned int) const;
-        unsigned int m1(unsigned int) const;
-        void print(double) const;
-        // Observables
-        double winding() const;
-        double cos_avg() const;
-        double cos_correlator(unsigned int) const;
-        double cos2_avg() const;
-        double cos2_correlator(unsigned int) const;
-        // Markov steps
-        int MetropolisSweep(double, double);
-        int TailorStep(double);
-};
-
-double Path::cos_avg() const {
-    double result = 0;
-    // Calculate <x^2> as average over entire path
-    for (unsigned int i = 0; i < size; ++i)
-        result += cos(2*M_PI*p[i]);
-    result /= size;
-    return result;
-}
-
-double Path::cos_correlator(unsigned int k) const {
-    double result = 0;
-    unsigned int i = 0;
-    unsigned int ik = 0;
-    for (unsigned int j = 0; j < k; ++j)
-        ik = p1(ik);
-    // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
-    for (i = 0; i < size; ++i) {
-        result += cos(2*M_PI*p[ik])*cos(2*M_PI*p[i]);
-        ik = p1(ik);
-    }
-    result /= size;
-    return result;
-}
-
-double Path::cos2_avg() const {
-    double result = 0;
-    // Calculate <x^2> as average over entire path
-    for (unsigned int i = 0; i < size; ++i)
-        result += cos(4*M_PI*p[i]);
-    result /= size;
-    return result;
-}
-
-double Path::cos2_correlator(unsigned int k) const {
-    double result = 0;
-    unsigned int i = 0;
-    unsigned int ik = 0;
-    for (unsigned int j = 0; j < k; ++j)
-        ik = p1(ik);
-    // Calculate C(k) as average of C(0, k), C(1, 1+k) ... C(s-1, s-1+k)
-    for (i = 0; i < size; ++i) {
-        result += cos(4*M_PI*p[ik])*cos(4*M_PI*p[i]);
-        ik = p1(ik);
-    }
-    result /= size;
-    return result;
-}
-
-double Path::winding() const {
-    double q = 0;
-    for (unsigned int i = 0; i < size; i++)
-        q += p[p1(i)] - p[i];
-    return q;
-}
-
-
-Path::Path(unsigned int s) {
-    p = new S1[s];
-    // Alloco la matrice interna delle condizioni al bordo
-    geometry = new unsigned int*[2];
-    geometry[0] = new unsigned int[s];
-    geometry[1] = new unsigned int[s];
-    for (unsigned int i = 0; i < s; i++) {
-        geometry[0][i] = i + 1;
-        geometry[1][i] = i - 1;
-    }
-    geometry[0][s-1] = 0;
-    geometry[1][0] = s - 1;
-    size = s;
-    for (unsigned int i = 0; i < size; i++)
-        p[i] = ran2();
-}
-
-Path::~Path() {
-    delete [] geometry[0];
-    delete [] geometry[1];
-    delete [] p;
-}
-
-void Path::print(double Neta) const {
-    printf("%.3f\t", winding());
-    double cos_avg2 = pow(cos_avg(),2);
-    for (unsigned int i = 0; i < size/(2*Neta); i++)
-        cout << cos_correlator(i) - cos_avg2 << "\t"; // connected correlator
-    double cos2_avg2 = pow(cos2_avg(),2);
-    for (unsigned int i = 0; i < size/(2*Neta); i++)
-        cout << cos2_correlator(i) - cos2_avg2 << "\t"; // connected correlator
-    cout << '\n';
-}
-
-
-unsigned int Path::p1(unsigned int i) const {
-    return geometry[0][i];
-}
-
-unsigned int Path::m1(unsigned int i) const {
-    return geometry[1][i];
-}
-
-const S1& Path::operator[](unsigned int i) const {
-    return p[i];
-}
-
-S1& Path::operator[](unsigned int i) {
-    return p[i];
-}
-
-int Path::MetropolisSweep(double eta, double delta) {
-    unsigned int accepted = 0;
-    for (unsigned int i = 0; i < size; i++) {
-        double x = delta*(2*ran2() - 1);
-        S1 yp = p[i] + x;
-
-        double dS = pow( p[p1(i)] - yp , 2);
-        dS += pow(yp - p[m1(i)], 2);
-        dS -= pow(p[p1(i)] - p[i],2);
-        dS -= pow(p[i] - p[m1(i)],2);
-        dS /= 2*eta;
-
-        double r = exp(-dS);
-
-        if (r > 1) {
-            p[i] = yp;
-            ++accepted;
-        }
-        else {
-            x = ran2();
-            if (x < r) {
-                p[i] = yp;
-                ++accepted;
-            }
-        }
-    }
-    return accepted;
-}
-
-int Path::TailorStep(double eta) {
-    //cout << "Attempting tailor (" << winding() << ")...";
-    //unsigned int start = floor(size * ran2());
-    unsigned int start = 0;
-    unsigned int stop = p1(start);
-    bool found = false;
-    while (!found && stop < (size - 1))  {
-        if (std::abs(p[stop] - p[start] - 0.5) < 0.2*eta) {
-            found = true;
-        } else {
-            stop = p1(stop);
-        }
-    }
-
-    if (found) {
-        // Metropolis test
-        S1 stop_p (2*p[start] - p[stop]);
-        double dS = pow(p[p1(stop)] - stop_p, 2);
-        dS -= pow(p[p1(stop)] - p[stop],2);
-        dS /= 2*eta;
-
-        double r = exp(-dS);
-
-        if (r > 1) {
-            unsigned int i = start;
-            while (i != stop) {
-                i = p1(i);
-                p[i] = 2*p[start] - p[i];
-            }
-            return 1;
-        }
-        else {
-            double x = ran2();
-            if (x < r) {
-                unsigned int i = start;
-                while (i != stop) {
-                    i = p1(i);
-                    p[i] = 2*p[start] - p[i];
-                }
-                return 1;
-            }
-        }
-    }
-    //cout << "failed" << endl;
-    return 0;
-}
 
 int main(int argc, char** argv) {
 
@@ -287,7 +86,6 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    ran2_init();
     const double Neta = atof(argv[1]);   // è essenzialmente la temperatura: Nη = β/mL^2
     const unsigned int N = atoi(argv[2]);
     const double eta = Neta/N;
@@ -303,22 +101,27 @@ int main(int argc, char** argv) {
     cout << "#Taking " << n_measures << " measures every " << n_skip << "sweeps + nonlocal move" << endl;
     cout << "#Local Metropolis algorithm (delta = " << delta << " ) + nonlocal tailor move each sweep" << endl;
     cout << "#C1(τ) = <cos(2πτ)cos(0)>_c, C2(τ) = <cos(4πτ)cos(0)>_c" << endl;
-    cout << "#Q\t";
-    for (unsigned int i = 0; i < N; ++i)
-        cout << "C1(" << i << ")\t";
-    for (unsigned int i = 0; i < N; ++i)
-        cout << "C2(" << i << ")\t";
-    cout << endl;
+    cout << "#Q\t[C1(0...)]\t[C2(0...)]" << endl;
 
-    Path* p = new Path(N);
+    PathSim* p = new PathSim(N);
 
     for (unsigned int i = 0; i < n_measures; ++i) {
+        // Markov steps
         for (unsigned int j = 0; j < n_skip; ++j) {
             m_accepted += p->MetropolisSweep(eta, delta);
             t_accepted += p->TailorStep(eta);
         }
-        p->print(Neta);
+        // Printing observables
+        printf("%.3f\t", p->winding()); // winding number
+        for (unsigned int k = 0; k < 1.5*N/(10*Neta); ++k)
+            cout << p->cos_correlator(k) << "\t";
+        double cos2_avg2 = pow(p->cos2_avg(),2);
+        for (unsigned int k = 0; k < 1.5*N/(10*Neta); ++k)
+            cout << p->cos2_correlator(k) - cos2_avg2 << "\t";
+        cout << "\n";
     }
+
+
 
     const unsigned long int m_steps = n_measures*N*n_skip;
     const unsigned long int t_steps = n_measures*n_skip;
@@ -330,6 +133,5 @@ int main(int argc, char** argv) {
     cout << "#Nonlocal move acceptance: " << t_accepted << " out of " << t_steps << " (" << static_cast<double>(t_accepted)/t_steps << ")" << endl;
     cout << "#Total acceptance: " << tot_accepted << " out of " << tot_steps << " (" << static_cast<double>(tot_accepted)/tot_steps << ")" << endl;
 
-    ran2_save();
     return 0;
 }
