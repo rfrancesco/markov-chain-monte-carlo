@@ -6,7 +6,7 @@ using std::endl;
 #include <random>
 
 #include "s1.hpp"
-#include "../../rng/ran.hpp"
+#include "../../rng/ran2_class.hpp"
 #include "pathsim.hpp"
 
 const double PI2 = pow(M_PI, 2);
@@ -77,7 +77,7 @@ const double PI2 = pow(M_PI, 2);
 // which could ruin parallel simulations
 
 std::random_device urandom("/dev/urandom");
-Ran ran(urandom());
+Ran2 ran(urandom());
 
 int main(int argc, char** argv) {
 
