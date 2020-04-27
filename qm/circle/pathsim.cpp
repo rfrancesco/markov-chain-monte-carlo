@@ -5,8 +5,7 @@
 // To be more general I'd probably have to define a Ran*
 // and pass it to the constructor
 
-extern Ran ran;
-
+extern Ran2 ran;
 
 // Constructor and destructor
 PathSim::PathSim(unsigned int s) {
@@ -21,8 +20,8 @@ PathSim::PathSim(unsigned int s) {
     next[s-1] = 0;
     prev[0] = s - 1;
     size = s;
-    for (unsigned int i = 0; i < size; i++)
-        p[i] = ran.doub();
+    //for (unsigned int i = 0; i < size; i++)
+    //    p[i] = ran.doub();
 }
 
 PathSim::~PathSim() {

@@ -2,7 +2,7 @@
 #define PATHSIM_H
 #include <cmath>
 #include "s1.hpp"
-#include "../../rng/ran.hpp"
+#include "../../rng/ran2_class.hpp"
 
 class PathSim {
     private:
