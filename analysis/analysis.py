@@ -9,15 +9,27 @@ from numba import njit
 
 @njit
 def var(data):
-    '''Numba-friendly shorthand for np.var(data, ddof=1).'''
+    '''Numba-friendly shorthand for np.var(data, ddof=1).
+    Estimator for the variance of a data set'''
     n = data.size
     return data.var() * n/(n-1)
 
 
 @njit
+def mean_var(data):
+    '''Variance of the mean of a data set'''
+    return var(data) / data.size
+
+@njit
 def std(data):
-    '''Numba-friendly shorthand for np.std(data, ddof=1).'''
+    '''Numba-friendly shorthand for np.std(data, ddof=1).
+    Estimator for the standard deviation of a data set'''
     return np.sqrt(var(data))
+
+@njit
+def mean_std(data):
+    '''Standard deviation of the mean of a data set'''
+    return np.sqrt(mean_var(data))
 
 
 @njit
@@ -34,6 +46,7 @@ def halve(data):
     return w.reshape(s, 2).sum(axis=1) / 2
 
 
+
 @njit
 def blocking(data):
     '''Blocking analysis for data with autocorrelation
@@ -42,10 +55,21 @@ def blocking(data):
     b_max = int(np.log2(data.size))
     b = np.empty(b_max)
     for i in range(b_max):
-        b[i] = std(x) / np.sqrt(x.size)
+        b[i] = mean_std(x)
         x = halve(x)
     return b 
 
+@njit
+def varblocking(data):
+    '''Blocking analysis for data with autocorrelation
+    Estimator for the variance of the mean'''
+    x = np.copy(data)
+    b_max = int(np.log2(data.size))
+    b = np.empty(b_max)
+    for i in range(b_max):
+        b[i] = mean_var(x)
+        x = halve(x)
+    return b 
 
 def plotblocking(data):
     '''plots blocking(data) with matplotlib'''
@@ -85,7 +109,10 @@ def bootstrap_var(data, blocksize, n_samples):
         sample = blocks[choices].flatten()
         f_samples[i] = var(sample)
     # Now, axis 0 picks the sample while axis 1 goes along each sample
-    # We can calculate the variance
+    # We can calculate the standard deviation
+    # Note that it is NOT mean_std! Otherwise, we could reduce our error
+    # by increasing n_samples
+    # (See Newman, Barkema: Monte-Carlo methods in Statistical Physics)
     f_std = std(f_samples)
     return f_std
 
@@ -94,7 +121,6 @@ def bootstrap_var_blocking(data, n_samples):
     '''Calculates the statistical error (std) on the variance of
     a 1D array of autocorrelated data, with the Bootstrap algorithm
     with blocks of increasing size'''
-    # reblocking analysis for data with autocorrelation
     x = np.copy(data)
     b_max = int(np.log2(x.size))
     b = [bootstrap_var(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
