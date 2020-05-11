@@ -7,6 +7,7 @@
 \usepackage{physics}
 \usepackage{graphicx}
 \usepackage{subfigure}
+\usepackage{hyperref}
 \usepackage[italiano, ruled]{algorithm2e}
 \usepackage[left=1in, right=1in]{geometry}
 
@@ -16,6 +17,7 @@
 \date{}
 
 \newcommand{\avg}[1]{\langle {#1} \rangle}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \begin{document}
 
@@ -84,10 +86,10 @@
     Possiamo scrivere l'energia libera del sistema, in termini di $\theta$, come
     
     \begin{equation}
-        F(\theta) = F_0 + \sum_{k=1}^{\infty} \frac{F^{(2k)}}{(2k)!} \theta^{2k}
+        F(\theta) = F^{(0)} + \sum_{k=1}^{\infty} \frac{F^{(2k)}}{(2k)!} \theta^{2k}
     \end{equation}
     
-    Dove abbiamo usato che F deve essere simmetrica per parità. Il termine $F_{(1)} \equiv \chi$ è detto \emph{suscettività topologica}.
+    Dove abbiamo usato che $F(\theta)$ deve essere simmetrica per parità. Il termine $F^{(1)} \equiv \chi$ è detto \emph{suscettività topologica}.
     
     Per evitare il problema del segno causato dal termine $iQ\theta$, conviene determinare $\chi$ simulando il sistema per $\theta = 0$, sfruttando la relazione
     
@@ -195,7 +197,7 @@
     Se l'algoritmo Metropolis locale è congelato sul modo $Q = 0$, allora 
     
     \begin{equation}
-        p_x (Q_x) \times p_{1-x} (- Q_x) = 1
+        p_x (Q_x) \times p_{1-x} (- Q_x) = \text{cost.}
     \end{equation}
 
     Se la distribuzione $p_x (Q_x)$ è gaussiana, si può mostrare che, con $\chi_x \equiv \avg{Q^2}/\beta$, 
@@ -209,9 +211,14 @@
     
     \section{Simulazioni numeriche}
     
-    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è RAN2. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
+    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è \code{RAN2}\footnote{In particolare, è una variante adattata a generare \code{double}, estratta dal codice di Athena++, Princeton University, disponibile all'indirizzo \url{https://github.com/PrincetonUniversity/athena-public-version/blob/master/src/utils/ran2.cpp}, lievemente riadattata per sfruttare le caratteristiche del C++.}. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
     
-    Il tempo di autocorrelazione $\tau_\chi$ è stato determinato confrontando la stima dell'errore \emph{naive} con quella ottenuta dal blocking.
+    Il tempo di autocorrelazione $\tau_\chi$ è stato determinato confrontando la stima dell'errore \emph{naïve}, ottenuta trascurando l'autocorrelazione dei dati, con quella ottenuta dal blocking. Ricordiamo che
+    
+    \begin{equation}
+        \sigma^2_{\chi \text{, corretta}} = 2 \tau_\chi \sigma^2_{\chi \text{, naïve}}
+    \end{equation}
+
     
     \subsection{Critical slowing down esponenziale}
     
@@ -223,7 +230,7 @@
     \end{figure}
 
     
-    In figura \ref{fig:csd_autocorr} sono riportati i tempi di autocorrelazione di $\chi$ nelle varie simulazioni. Osserviamo che, qualitativamente, i valori di $\tau_\chi$ ottenuti dalle simulazioni con l'algoritmo locale si dispongono su un andamento grossomodo esponenziale, mentre quelli ottenuti dall'algoritmo non locale sembrano ``saturare'' ad un valore dipendente da $\beta$. Questa non è assolutamente un'analisi rigorosa, ma si può già vedere come l'algoritmo non-locale risolva in maniera efficiente il problema del critical slowing down esponenziale.
+    In figura \ref{fig:csd_autocorr} sono riportati i tempi di autocorrelazione di $\chi$ nelle varie simulazioni. Osserviamo che, qualitativamente, i valori di $\tau_\chi$ ottenuti dalle simulazioni con l'algoritmo locale si dispongono su un andamento grossomodo esponenziale, mentre quelli ottenuti dall'algoritmo non-locale sembrano ``saturare'' ad un valore dipendente da $\beta$. Questa non è assolutamente un'analisi rigorosa, ma si può già vedere come l'algoritmo non-locale risolva in maniera efficiente il problema del critical slowing down esponenziale.
     
     \begin{figure}[htb]
         \centering
@@ -233,7 +240,7 @@
         \label{fig:csd_topfreezing}
     \end{figure}
     
-    In figura \ref{fig:csd_topfreezing} possiamo vedere il confronto tra le storie Monte Carlo delle simulazioni fatte con l'algoritmo locale e l'algoritmo non locale, a $\beta = 5$. Notiamo che, con l'algoritmo locale, la carica topologica tende a fluttuare meno già per $N = 500$, A $N = 750$, la carica topologica cambia poche decine di volte in $10^6$ misure. A $N = 1000$, la carica topologica è completamente congelata a $Q = 0$. Nelle simulazioni fatte con l'algoritmo non locale, invece, il problema è completamente risolto: in tutte le simulazioni effettuate, $Q$ ``fluttua'' allo stesso modo.
+    In figura \ref{fig:csd_topfreezing} possiamo vedere il confronto tra le storie Monte Carlo delle simulazioni fatte con l'algoritmo locale e l'algoritmo non-locale, a $\beta = 5$. Notiamo che, con l'algoritmo locale, la carica topologica tende a fluttuare meno già per $N = 500$. Per $N = 750$, la carica topologica cambia poche decine di volte in $10^6$ misure, mentre per $N = 1000$ è completamente congelata a $Q = 0$. Nelle simulazioni fatte con l'algoritmo non locale, invece, il problema è completamente risolto: in tutte le simulazioni effettuate, $Q$ ``fluttua'' allo stesso modo.
     
     \subsection{Misura della suscettività topologica}
     
