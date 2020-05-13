@@ -11,7 +11,7 @@ plt.figure(1)
 plt.yscale('log')
 plt.title('Confronto di $\\tau_\\chi$ tra algoritmo locale e non-locale')
 plt.xlabel('$1/\\eta$')
-plt.ylabel('$\\tau_\\chi$')
+plt.ylabel('$\\tau_\\chi$ [spazzate]')
 
 markers = {
     "local" : "o",
@@ -21,6 +21,7 @@ markers = {
 for (alg, Neta) in product(algs, Netas):
     print(f'{Neta}, {alg}')
     N, chi, dchi, tau = np.loadtxt(f"blocking_out_{alg}/{Neta}", unpack=True)
+    tau = tau*10 / 2 # fattore /2: mi sono dimenticato di dividere, quindi in realtà sono tutti sballati di un fattore 2
     plt.plot(N/Neta, tau, linestyle='', marker=markers[alg], label=f'$N\\eta$ = {Neta}, {alg}')
 
 plt.legend()
