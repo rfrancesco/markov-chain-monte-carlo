@@ -1,14 +1,24 @@
-\documentclass[10pt, a4paper, twocolumn]{article}
-\usepackage[italian]{babel}
+\documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{graphicx}
+\usepackage[italian]{babel}
 \usepackage{amsmath}
-\usepackage{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{tabu, wrapfig}
+\usepackage[italiano, ruled]{algorithm2e}
+\usepackage[left=1in, right=1in]{geometry}
 
-\newcommand{\avg}[1]{\langle{#1}\rangle}
+\newcommand{\avg}[1]{\langle {#1} \rangle}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \title{Simulazione numerica del modello di Ising 2D}
 \author{Rocco Francesco Basta}
+\date{}
 
 \begin{document}
 	\maketitle
@@ -61,43 +71,150 @@
 		\begin{equation}
 			C \sim |t|^{-\alpha}
 		\end{equation}
+		\label{eqn:t_scaling}
 		\end{subequations}
 
 		Gli esponenti critici sono noti esattamente: $\nu = 1$, $\beta = 1/8$,
 		$\gamma = 7/4$, $\alpha = 0$.
 
+		Le simulazioni sono effettuate a volume finito. Di conseguenza, $\avg{M}$ non è un buon parametro d'ordine, perché per simulazioni abbastanza lunghe si deve annullare. Al suo posto, si deve studiare $\avg{|M|}$, e anche $\chi$ va misurata calcolando la varianza di $|M|$.
+		
+		Per non appesantire la scrittura, d'ora in poi indicheremo semplicemente con $M, \epsilon$ le quantità $\avg{|M|}, \avg{\epsilon}$.
+		
 		Per volumi finiti, $\xi$ non può divergere e diventa confrontabile
 		con $L$. Assumendo che nell'intorno della transizione il sistema perda
 		memoria del comportamento microscopico (e quindi della spaziatura del
 		reticolo),
-		si ottiengono delle relazioni di scaling per $\avg{M}$, $\chi$ e $C$:
+		si ottengono delle relazioni di scaling per $M$, $\chi$ e $C$:
 
 		\begin{subequations}
 		  \begin{equation}
-			\chi(\beta, L) = L^{\gamma/\nu} f(tL^{1/\nu})
+			\chi(\beta, L) = L^{\gamma/\nu} f_\chi (tL^{1/\nu})
 		  \end{equation}
+		  \begin{equation}
+			C(\beta, L) = L^{\alpha/\nu} f_C (tL^{1/\nu})
+		  \end{equation}
+		  \begin{equation}
+			M(\beta, L) = L^{\beta/\nu} f_M(tL^{1/\nu})
+		  \end{equation}
+		  \label{eqn:fs_scaling}
 		\end{subequations}
 
-	\section{Metodologia}
+	\section{Simulazioni numeriche}
 
 	La transizione è stata studiata attraverso un algoritmo Metropolis per
-	reticoli di dimensione $L = 20,30,40,50,60$, con $\beta$ compreso tra 0.3 e
-	0.505. Per ogni coppia $(L, \beta )$,
-	sono state prese $10^{6}$ misure, ognuna ogni $100 \cdot L^{2}$ singoli passi
-	di update, partendo da un reticolo di spin orientati casualmente. Questa
-	scelta della configurazione iniziale non è necessariamente la migliore, ma
-	una diversa scelta influirebbe solo in un diverso tempo di termalizzazione
-	del sistema.
+	reticoli di dimensione $N = 20,30,40,50,60$, con $\beta$ compreso tra 0.3 e
+	0.505. Per ogni coppia $(N, \beta )$,
+	sono state prese $10^{5}$ misure, ognuna ogni spazzata di update, partendo da un reticolo di spin orientati casualmente. 
 
 	La simulazione è stata effettuata in assenza di campo magnetico esterno
 	($h = 0$), e fissando $J = 1$.
 
-	Gli errori su $\avg{\epsilon}$ e $\avg{M}$ sono stati
+	Gli errori su $\epsilon$ e $M$ sono stati
 	stimati attraverso un processo di blocking, mentre gli errori su $\chi$ e $C$ sono stati stimati attraverso un algoritmo Bootstrap.
 
-	Il generatore di numeri casuali utilizzato è RAN2 (W. H. Press, S. A.
-	Teutolsky, W. T. Vetterling, B. P. Flannery, \emph{Numerical Recipes, Third Edition}).
+	Il generatore di numeri casuali utilizzato è \code{RAN2}, tratto dalle \emph{Numerical Recipes for C}.
+	
+	\subsection{Misure effettuate}
+	
+	Sono riportati in figura \ref{fig:em_plot} i grafici di $M, \epsilon$ in funzione di $\beta$ ottenuti nelle simulazioni. In figura \ref{fig:chiC_plot} invece è riportato l'andamento di $\chi$ e di $C$.
+	
+	\begin{figure}
+        \subfloat[$M$]{\includegraphics[width=0.5\textwidth]{figure/m_plot.pdf}}
+        \subfloat[$\epsilon$]{\includegraphics[width=0.5\textwidth]{figure/e_plot.pdf}}
+        \caption{Magnetizzazione e densità di energia in funzione di $\beta$.}
+        \label{fig:em_plot}
+	\end{figure}
+	
+	\begin{figure}
+        \subfloat[$\chi$]{\includegraphics[width=0.5\textwidth]{figure/chi_plot.pdf}}
+        \subfloat[$C$]{\includegraphics[width=0.5\textwidth]{figure/C_plot.pdf}}
+        \caption{Suscettività magnetica e capacità termica in funzione di $\beta$.}
+        \label{fig:chiC_plot}
+	\end{figure}
+	
+	Possiamo utilizzare i valori teorici degli indici critici per verificare le relazioni di scaling (eq. \ref{eqn:fs_scaling}). Il risultato è riportato in figura \ref{fig:mchiC_scaling_plot}. Per ottenere il collasso per la capacità termica, è stato necessario sottrarre un termine di fondo che non diverge attorno al punto critico. Per semplicità, questo è stato fatto sottraendo a $C$ il suo massimo, per ogni $N$, prima di applicare la relazione di scaling. Questo metodo non è pienamente soddisfacente, tuttavia il risultato è abbastanza buono nei pressi di $\beta_c$. 
+	
+	\begin{figure}
+        \subfloat[$M$]{\includegraphics[width=0.5\textwidth]{figure/m_scaling.pdf}}
+        \subfloat[$\chi$]{\includegraphics[width=0.5\textwidth]{figure/chi_scaling.pdf}} \\
+        \subfloat[$C$]{\includegraphics[width=0.5\textwidth]{figure/C_scaling.pdf}}
+        \caption{Verifica dello scaling di size finito per $M$, $\chi$, $C$ utilizzando i valori teorici degli indici critici.}
+        \label{fig:mchiC_scaling_plot}
+	\end{figure}
+
+	
+	\subsection{Temperatura critica}
+	
+    A N finito, il massimo di $\chi$ non corrisponde a $\beta_c$, ma a un valore inferiore, detto $\beta_{pc}$ ($\beta$ pseudocritico). Lo stesso avviene per $C$, ad una diversa temperatura $\beta'_{pc}$.
+    
+    Dalle equazioni (\ref{eqn:t_scaling}) e (\ref{eqn:fs_scaling}) è facile dimostrare che $\beta_{pc}$ soddisfa una relazione analoga
+    
+    \begin{equation}
+        \beta_{pc} = \beta_c + x N^{-1/\nu}
+        \label{eqn:bpc_scaling}
+    \end{equation}
+    
+    da cui possiamo ricavare $\beta_c$ e $\nu$.
+    
+    Alle misure di $\beta_{pc}$ ottenute considerando il massimo della suscettività, è stato associato un errore $\Delta \beta_{pc}$ pari a metà della distanza tra due misure consecutive ($\Delta \beta_{pc} = 0.0025$).
+    
+    Non è stato possibile effettuare un fit numerico alla funzione (\ref{eqn:bpc_scaling}) lasciando liberi tutti e tre i parametri $\beta_c$, $x$ e $\nu$, per problemi di convergenza del fit.
+    
+    Tuttavia, un fit con $\nu = 1$ fissato fornisce $\beta_c = 0.4395(29)$, che è compatibile con il valore teorico, con un $\chi^2 / \text{ndof} \simeq 1.24$. Il grafico è riportato nella figura \ref{fig:bc_fit}.
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{figure/fit_bpc.pdf}
+        \caption{Misura di $\beta_c$ dal fit di $\beta_{pc}(N)$.}
+        \label{eqn:bpc_scaling}
+    \end{figure}
 
 
+	
+	\subsection{Scaling rispetto alla temperatura}
+	
+	Come prima cosa, si è tentato di estrarre gli indici critici da un fit analitico di $\chi, C, M$ in funzione di $t$, vicino alla transizione.
+
+	I fit sono stati effettuati con le misure ottenute dal reticolo più grande ($N = 60$), e sono stati eseguiti in entrambe le regioni scalanti $t > 0$ e $t < 0$ (tranne $M$, perché la relazione di scaling vale solo per $T < T_c$).
+	
+	Il fatto che $\alpha = 0$ implica $C \sim \log(t)$ nella regione scalante.
+	
+	I fit per $\chi$ e $C$ sono riportati nelle figure \ref{fig:chi_fit} e \ref{fig:C_fit}. 
+	
+	\begin{wraptable}{r}{5.5cm}
+        \begin{tabular}{c c c} \hline 
+                & $\gamma$  & $\chi^2 / \text{ndof}$ \\ \hline
+                $\beta > \beta_c$ & 1.783(53) & 1.77 \\
+                $\beta < \beta_c$ & 1.743(45) & 0.76  \\ \hline
+        \end{tabular}
+	\end{wraptable}
+	
+	\begin{wraptable}{r}{5.5cm}
+        \begin{tabular}{c c c} \hline 
+                & $C$  & $\chi^2 / \text{ndof}$ \\ \hline
+                $\beta > \beta_c$ & 1.783(53) & 1.77 \\
+                $\beta < \beta_c$ & 1.743(45) & 0.76  \\ \hline
+        \end{tabular}
+	\end{wraptable}
+
+	
+	\begin{figure}
+        \centering
+        \subfloat[$\beta > \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/chi_fit.pdf}}
+        \subfloat[$\beta < \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/chi_fit_rev.pdf}}
+        \caption{Fit della suscettività magnetica $\chi$ nella regione scalante.}
+        \label{fig:chi_fit}
+	\end{figure}
+
+	\begin{figure}
+        \centering
+        \subfloat[$\beta > \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/C_fit.pdf}}
+        \subfloat[$\beta < \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/C_fit_rev.pdf}}
+        \caption{Fit della capacità termica $C$ nella regione scalante.}
+        \label{fig:C_fit}
+	\end{figure}
+
+	\subsection{Analisi di size finito per $\beta = \beta_c$}
 
 \end{document}
