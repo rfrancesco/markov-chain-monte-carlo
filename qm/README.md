@@ -30,4 +30,6 @@ algorithm.
   "Tailor" move  
   Reference: C. Bonati, M. D'Elia, _Topological critical slowing down:
     Variations on a toy model_, Phys. Rev. E 98, 013308 (2018)
+  - slab.cpp: Free particle on a 1D circle. Technique for extracting the topological susceptibility with a local algorithm,
+  when ergodicity among different topological sectors is lost (topological charge is frozen at Q = 0).
   - run.sh: Simple launcher script with GNU Parallel
