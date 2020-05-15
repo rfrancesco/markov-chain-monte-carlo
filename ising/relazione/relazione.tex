@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{parskip}
 \usepackage{tabu, wrapfig}
+\usepackage{multicol}
 \usepackage[italiano, ruled]{algorithm2e}
 \usepackage[left=1in, right=1in]{geometry}
 
@@ -39,18 +40,22 @@
 		specifico $C$ del sistema: sia $V$ il volume del reticolo,
 
 		\begin{subequations}
+		\begin{multicols}{2}
+
 		\begin{equation}
 			M \equiv \frac{1}{V} \sum_i s_i
 		\end{equation}
 		\begin{equation}
 			\epsilon \equiv \frac{E}{V}
 		\end{equation}
+		
 		\begin{equation}
 			\chi \equiv \frac{\partial \avg{M}}{\partial h} \propto V ( \avg{M^2} - \avg{M}^2)
 		\end{equation}
 		\begin{equation}
 			C \equiv \frac{\partial \avg{\epsilon}}{\partial T} \propto V (\avg{\epsilon^2} - \avg{\epsilon}^2)
 		\end{equation}
+		\end{multicols}
 
 		\end{subequations}
 
@@ -60,6 +65,7 @@
 		dagli esponenti critici $\alpha, \beta, \gamma, \nu$. Definendo la temperatura ridotta $t \equiv \beta - \beta_c$,
 
 		\begin{subequations}
+		\begin{multicols}{2}
 		\begin{equation}
 			\xi \sim |t|^{-\nu} 
 		\end{equation}
@@ -72,6 +78,7 @@
 		\begin{equation}
 			C \sim |t|^{-\alpha}
 		\end{equation}
+		\end{multicols}
 		\label{eqn:t_scaling}
 		\end{subequations}
 
@@ -218,7 +225,7 @@
             C = a \log t + c
         \end{equation}  
         \begin{equation}
-            \log m = \beta \log t + c
+            \log M = \beta \log t + c
         \end{equation}
 	\end{subequations}
 
@@ -283,10 +290,63 @@
 	\end{table}
 
 	\subsection{Analisi di size finito per $\beta = \beta_c$}
-
+	\begin{wraptable}{r}{6.5cm}
+       \centering
+        \begin{tabular}{c c c c } \hline 
+                $\gamma/\nu$  & c    & corr. & $\chindof$ \\ 
+                1.739(31) & -2.57(11)   & 0.993   & 1.67 \\ \hline
+                a  & b    & corr. & $\chindof$ \\ 
+                2.554(78) & 0.66(27)   & -0.992   & 1.12 \\ \hline
+                $-\beta/\nu$  & c    & corr. & $\chindof$ \\ 
+                0.1220(39) & -0.002(13)   & 0.992   & 0.68 \\ \hline
+        \end{tabular}
+        \caption{Fit analitico di $\chi_c(N)$, $C_c(N)$ e $M_c(N)$.}
+        \label{tab:fs_fit}
+	\end{wraptable}
 	Dato il risultato insoddisfacente dell'ultimo fit, si è provato a misurare gli indici critici del modello studiando gli effetti di size finito. Sono state effettuate nuove simulazioni con $\beta = 0.440687 \simeq \beta_c$, N = 20, 25, 30, 25, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100. Per ogni simulazione sono state prese 125000 misure, una ogni 10 spazzate, e il numero di misure scartate per termalizzazione è stato determinato nello stesso modo.
 	
-	L'idea è di sfruttare le equazioni (\ref{eqn:fs_scaling}) per ottenere da un fit i rapporti $\beta / \nu$, $\alpha / \nu$, $\gamma / \nu$.
+	L'idea è di sfruttare le equazioni (\ref{eqn:fs_scaling}) per ottenere da un fit i rapporti $\beta / \nu$, $\alpha / \nu$, $\gamma / \nu$. 
+
+	
+	I dati raccolti sono stati quindi fittati con le seguenti funzioni:
+    %	
+	\begin{subequations}
+        \begin{equation}
+            \log \chi_c = - \frac{\gamma}{\nu} \log N + c
+        \end{equation}
+         \begin{equation}
+            C_c = a \log N + c
+        \end{equation}  
+        \begin{equation}
+            \log M_c = \frac{\beta}{\nu} \log N + c
+        \end{equation}
+	\end{subequations}
+    %	
+	I risultati dei fit sono riportati nelle figure \ref{fig:chi_fs_fit}, \ref{fig:C_fs_fit}, \ref{fig:M_fs_fit} e nella tabella \ref{tab:fs_fit}. In tutti e tre i casi, si ha un ottimo accordo con la previsione teorica. In particolare, la stima di $\beta / \nu$ ottenuta con questo metodo è compatibile con il valore teorico $\beta / \nu = 1/8$, a differenza della stima di $\beta$ ottenuta studiando lo scaling rispetto a $t$.
+	
+	\begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{figure/chi_fs_fit.pdf}
+        \caption{Fit analitico di $\chi_c(N)$.}
+        \label{fig:chi_fs_fit}
+	\end{figure}
+
+	\begin{figure}[h]
+        \centering
+        \includegraphics[width=0.7\textwidth]{figure/C_fs_fit.pdf}
+        \caption{Fit analitico di $C_c(N)$.}
+        \label{fig:C_fs_fit}
+	\end{figure}
+	
+	
+	\begin{figure}[h]
+        \centering
+        \includegraphics[width=0.7\textwidth]{figure/m_fs_fit.pdf}
+        \caption{Fit analitico di $M_c(N)$.}
+        \label{fig:M_fs_fit}
+	\end{figure}
+	
+	
 	
 	
 \end{document}
