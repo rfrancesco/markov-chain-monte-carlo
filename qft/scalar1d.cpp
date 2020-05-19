@@ -1,5 +1,8 @@
 #include "scalar1d.hpp"
 #include <cmath>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 extern Ran2 ran;
 
@@ -7,23 +10,25 @@ Scalar1D::Scalar1D(unsigned int Nx, unsigned int Nt, double mass) {
     this->Nx = Nx;
     this->Nt = Nt;
     this->mass = mass;
-    mass2 = pow(mass,2);
+    mass2 = mass * mass;
     m2p4 = mass2 + 4;
     // Ignoring memory issues for now
     lattice = new double*[Nx];
     for (unsigned int x = 0; x < Nx; ++x)
         lattice[x] = new double[Nt];
     // Setting up periodic conditions...
+    // Space
     xnext = new unsigned int[Nx];
     xprev = new unsigned int[Nx];
-    tnext = new unsigned int[Nt];
-    tprev = new unsigned int[Nt];
     for (unsigned int x = 0; x < Nx; ++x) {
         xnext[x] = x + 1;
         xprev[x] = x - 1;
     }
     xnext[Nx - 1] = 0;
     xprev[0] = Nx - 1;
+    // Time
+    tnext = new unsigned int[Nt];
+    tprev = new unsigned int[Nt];
     for (unsigned int t = 0; t < Nt; ++t) {
         tnext[t] = t + 1;
         tprev[t] = t - 1;
@@ -33,7 +38,7 @@ Scalar1D::Scalar1D(unsigned int Nx, unsigned int Nt, double mass) {
     // Initialization to zero
     for (unsigned int x = 0; x < Nx; ++x)
         for (unsigned int t = 0; t < Nt; ++t)
-            lattice[x][t] = 0;
+            lattice[x][t] = ran.doub();
 }
 
 Scalar1D::~Scalar1D() {
@@ -59,13 +64,31 @@ double& Scalar1D::operator()(unsigned int x, unsigned int t) {
 
 // Measurements
 
-double Scalar1D::TraceAnomaly() {
-    // returns (ε - p)/T²
-    double phi2_avg = 0;
+double Scalar1D::M2Phi2() const {
+    return m2phi2;
+}
+
+double Scalar1D::xdPhi2() const {
+    return xdphi2;
+}
+
+double Scalar1D::tdPhi2() const {
+    return tdphi2;
+}
+
+void Scalar1D::CalculateObservables() {
+    m2phi2 = 0;
+    xdphi2 = 0;
+    tdphi2 = 0;
     for (unsigned int x = 0; x < Nx; ++x)
-        for (unsigned int t = 0; t < Nt; ++t)
-            phi2_avg += pow(lattice[x][t], 2);
-    return phi2_avg * Nx * Nt / mass2;
+        for (unsigned int t = 0; t < Nt; ++t) {
+            m2phi2 += pow(lattice[x][t],2);
+            tdphi2 += pow(lattice[x][tnext[t]] - lattice[x][t], 2);
+            xdphi2 += pow(lattice[xnext[x]][t] - lattice[x][t], 2);
+        }
+    m2phi2 *= mass2 / (Nx * Nt);
+    tdphi2 /= Nx * Nt;
+    xdphi2 /= Nx * Nt;
 }
 
 // Markov steps
@@ -82,7 +105,6 @@ void Scalar1D::HeatbathSweep() {
         for (unsigned int t = 0; t < Nt; ++t) {
             double mean = Force(x,t)/m2p4;
             double variance = 1/m2p4;
-
             lattice[x][t] = ran.gaussian(mean, variance);
         }
 }
@@ -93,4 +115,15 @@ void Scalar1D::OverrelaxationSweep() {
             double mean = Force(x,t)/m2p4;
             lattice[x][t] = (2 * mean) - lattice[x][t];
         }
+}
+
+// Debug
+void Scalar1D::_PrintGeometry() const {
+    cout << "X" << endl;
+    for (unsigned int x = 0; x < Nx; ++x)
+        cout << xprev[x] << x << xnext[x] << endl;
+
+    cout << "T" << endl;
+    for (unsigned int t = 0; t < Nt; ++t)
+        cout << tprev[t] << t << tnext[t] << endl;
 }

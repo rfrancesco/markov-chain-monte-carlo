@@ -29,7 +29,12 @@ int main(int argc, char** argv) {
 
     for (unsigned int i = 0; i < n_measures; ++i) {
         field->HeatbathSweep();
-        cout << field->TraceAnomaly() << endl;
+        field->OverrelaxationSweep();
+        field->OverrelaxationSweep();
+        field->OverrelaxationSweep();
+        field->OverrelaxationSweep();
+        field->CalculateObservables();
+        cout << field->M2Phi2() << "\t" << field->xdPhi2() << "\t" << field->tdPhi2() << endl;
     }
 
 }
