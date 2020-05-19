@@ -12,20 +12,17 @@
 
 class Ran2 {
     private:
-	// Internal state
+    // Internal state
         std::int64_t idum;
         std::int64_t idum2;
         std::int64_t iy;
         std::int64_t iv[NTAB];
-	// Box-Muller buffer (generates 2 numbers, keeps 1 stored for easy retrieval)
-        double boxmuller_buffer;
-        bool boxmuller_buffer_full = false;
     public:
-	// Constructor - takes integer seed > 0 (sign is flipped inside the constructor)
+        // Constructor - takes integer seed > 0 (sign is flipped inside the constructor)
         explicit Ran2(std::int64_t);
-	// Generate random double (uniform deviates)
+        // Generate random double (uniform deviates)
         double doub();
-    	// Generate gaussian double with Box-Muller algorithm
+        // Generate gaussian double with Box-Muller algorithm
         double gaussian(double, double);
 };
 
