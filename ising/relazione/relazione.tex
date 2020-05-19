@@ -38,17 +38,16 @@
 		Possiamo definire la densità di magnetizzazione $M$, la densità di
 		energia $\epsilon$, la suscettività magnetica $\chi$ e il calore
 		specifico $C$ del sistema: sia $V$ il volume del reticolo,
-
+		%
 		\begin{subequations}
 		\begin{multicols}{2}
-
 		\begin{equation}
 			M \equiv \frac{1}{V} \sum_i s_i
 		\end{equation}
 		\begin{equation}
 			\epsilon \equiv \frac{E}{V}
 		\end{equation}
-		
+
 		\begin{equation}
 			\chi \equiv \frac{\partial \avg{M}}{\partial h} \propto V ( \avg{M^2} - \avg{M}^2)
 		\end{equation}
@@ -63,7 +62,7 @@
 		$\beta_c \equiv 1/T_{c} \simeq 0.4407$. Attorno al punto critico, la lunghezza di
 		correlazione $\xi$ diverge, e il comportamento del sistema è descritto
 		dagli esponenti critici $\alpha, \beta, \gamma, \nu$. Definendo la temperatura ridotta $t \equiv \beta - \beta_c$,
-
+		%
 		\begin{subequations}
 		\begin{multicols}{2}
 		\begin{equation}
@@ -72,6 +71,7 @@
 		\begin{equation}
 			\avg{M} \sim |t|^\beta \quad (T < T_c) 
 		\end{equation}
+		
 		\begin{equation}
 			\chi \sim |t|^{-\gamma}
 		\end{equation}
@@ -96,15 +96,18 @@
 		si ottengono delle relazioni di scaling per $M$, $\chi$ e $C$:
 
 		\begin{subequations}
+		\begin{multicols}{2}
 		  \begin{equation}
 			\chi(\beta, L) = L^{\gamma/\nu} f_\chi (tL^{1/\nu})
 		  \end{equation}
 		  \begin{equation}
 			C(\beta, L) = L^{\alpha/\nu} f_C (tL^{1/\nu})
 		  \end{equation}
+		  
 		  \begin{equation}
 			M(\beta, L) = L^{\beta/\nu} f_M(tL^{1/\nu})
 		  \end{equation}
+        \end{multicols}
 		  \label{eqn:fs_scaling}
 		\end{subequations}
 
@@ -146,6 +149,7 @@
 	Possiamo utilizzare i valori teorici degli indici critici per verificare le relazioni di scaling (eq. \ref{eqn:fs_scaling}). Il risultato è riportato in figura \ref{fig:mchiC_scaling_plot}. Per ottenere il collasso per il calore specifico, è stato necessario sottrarre un termine di fondo che non diverge attorno al punto critico. Per semplicità, questo è stato fatto sottraendo a $C$ il suo massimo, per ogni $N$, prima di applicare la relazione di scaling.
 	
 	\begin{figure}[htb]
+        \centering
         \subfloat[$M$]{\includegraphics[width=0.5\textwidth]{figure/m_scaling.pdf}}
         \subfloat[$\chi$]{\includegraphics[width=0.5\textwidth]{figure/chi_scaling.pdf}} \\
         \subfloat[$C$]{\includegraphics[width=0.5\textwidth]{figure/C_scaling.pdf}}
@@ -218,18 +222,21 @@
 	Il fatto che $\alpha = 0$ implica $C \sim \log(t)$ nella regione scalante. I dati sono quindi stati fittati alle equazioni
 	
 	\begin{subequations}
+	\begin{multicols}{2}
         \begin{equation}
             \log \chi = - \gamma \log t + c
         \end{equation}
          \begin{equation}
             C = a \log t + c
         \end{equation}  
+        
         \begin{equation}
             \log M = \beta \log t + c
         \end{equation}
+    \end{multicols}
 	\end{subequations}
 
-	\begin{table}[hbt]
+	\begin{table}[bt]
         \centering
         \begin{tabular}{c | c c c c c } \hline 
                                   & $\gamma$  & c    & corr. & $\chindof$ & regione scalante \\ \hline
@@ -258,7 +265,7 @@
         \centering
         \subfloat[$\beta > \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/chi_fit.pdf}}
         \subfloat[$\beta < \beta_c$]{\includegraphics[width=0.5\textwidth]{figure/chi_fit_rev.pdf}}
-        \caption{Fit della suscettività magnetica $\chi$ nella regione scalante.}
+		\caption{Fit della suscettività magnetica $\chi$ nella regione scalante. Nella parte inferiore del grafico, sono riportati i residui nornalizzati $R \equiv (\chi_{\text{misura}} - \chi_\text{fit})/d\chi_\text{misura}$.}
         \label{fig:chi_fit}
 	\end{figure}
 
@@ -297,7 +304,7 @@
                 1.739(31) & -2.57(11)   & 0.993   & 1.67 \\ \hline
                 a  & b    & corr. & $\chindof$ \\ 
                 2.554(78) & 0.66(27)   & -0.992   & 1.12 \\ \hline
-                $-\beta/\nu$  & c    & corr. & $\chindof$ \\ 
+                $\beta/\nu$  & c    & corr. & $\chindof$ \\ 
                 0.1220(39) & -0.002(13)   & 0.992   & 0.68 \\ \hline
         \end{tabular}
         \caption{Fit analitico di $\chi_c(N)$, $C_c(N)$ e $M_c(N)$.}
@@ -322,29 +329,17 @@
         \end{equation}
 	\end{subequations}
     %	
-	I risultati dei fit sono riportati nelle figure \ref{fig:chi_fs_fit}, \ref{fig:C_fs_fit}, \ref{fig:M_fs_fit} e nella tabella \ref{tab:fs_fit}. In tutti e tre i casi, si ha un ottimo accordo con la previsione teorica. In particolare, la stima di $\beta / \nu$ ottenuta con questo metodo è compatibile con il valore teorico $\beta / \nu = 1/8$, a differenza della stima di $\beta$ ottenuta studiando lo scaling rispetto a $t$.
+	I risultati dei fit sono riportati in figura \ref{fig:fs_fit} e nella tabella \ref{tab:fs_fit}. In tutti e tre i casi, si ha un ottimo accordo con la previsione teorica. In particolare, la stima di $\beta / \nu$ ottenuta con questo metodo è compatibile con il valore teorico $\beta / \nu = 1/8$, a differenza della stima di $\beta$ ottenuta studiando lo scaling rispetto a $t$.
 	
 	\begin{figure}[h!]
         \centering
-        \includegraphics[width=0.7\textwidth]{figure/chi_fs_fit.pdf}
-        \caption{Fit analitico di $\chi_c(N)$.}
-        \label{fig:chi_fs_fit}
+        \subfloat{\includegraphics[width=0.5\textwidth]{figure/chi_fs_fit.pdf}}
+        \subfloat{\includegraphics[width=0.5\textwidth]{figure/C_fs_fit.pdf}} \\
+        \subfloat{\includegraphics[width=0.5\textwidth]{figure/M_fs_fit.pdf}}
+        \caption{Finite size scaling: Fit analitico di $\chi_c(N)$, $C_c(N)$ e $M_c(N)$.}
+        \label{fig:fs_fit}
 	\end{figure}
 
-	\begin{figure}[h]
-        \centering
-        \includegraphics[width=0.7\textwidth]{figure/C_fs_fit.pdf}
-        \caption{Fit analitico di $C_c(N)$.}
-        \label{fig:C_fs_fit}
-	\end{figure}
-	
-	
-	\begin{figure}[h]
-        \centering
-        \includegraphics[width=0.7\textwidth]{figure/m_fs_fit.pdf}
-        \caption{Fit analitico di $M_c(N)$.}
-        \label{fig:M_fs_fit}
-	\end{figure}
 	
 	
 	

@@ -207,7 +207,7 @@
     
     \section{Simulazioni numeriche}
     
-    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è \code{RAN2}\footnote{In particolare, è una variante adattata a generare \code{double}, estratta dal codice di Athena++, Princeton University, disponibile all'indirizzo \url{https://github.com/PrincetonUniversity/athena-public-version/blob/master/src/utils/ran2.cpp}, lievemente riadattata per sfruttare le caratteristiche del C++.}. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
+    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale, con condizioni iniziali fissate a 0. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è \code{RAN2}\footnote{In particolare, è una variante adattata a generare \code{double}, estratta dal codice di Athena++, Princeton University, disponibile all'indirizzo \url{https://github.com/PrincetonUniversity/athena-public-version/blob/master/src/utils/ran2.cpp}, lievemente riadattata per sfruttare alcune caratteristiche del C++.}. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
     
     Il tempo di autocorrelazione $\tau_\chi$ è stato determinato confrontando la stima dell'errore \emph{naïve}, ottenuta trascurando l'autocorrelazione dei dati, con quella ottenuta dal blocking. Ricordiamo che
     
@@ -254,11 +254,11 @@
     \end{wraptable}
     
 
-    Queste simulazioni sono state utilizzate per determinare la suscettività topologica del sistema per $\beta = 5, 10, 15$. Il valore teorico da confrontare è $\chi \to 1$ per $\beta \to \infty$.
+    Queste simulazioni sono state utilizzate per determinare la suscettività topologica del sistema per $\beta = 5, 10, 15$. Il valore teorico da confrontare è $\chi \to 1$ per $\beta \gg 1$.
     
     Il limite al continuo è stato effettuato con un fit numerico alla funzione $\chi_\beta(\eta) = \chi_\beta + b\eta^2$, in modo da estrarre la misura della suscettività $\chi_\beta$ a temperatura $\beta$.
     
-    I valori ottenuti sono riportati in tabella \ref{tab:top_tailor}, e i rispettivi fit sono riportati in figura \ref{fig:top_tailor}. Sono tutti compatibili (entro $1\sigma$!) con il valore atteso per $\beta \to \infty$.
+    I valori ottenuti sono riportati in tabella \ref{tab:top_tailor}, e i rispettivi fit sono riportati in figura \ref{fig:top_tailor}. Sono tutti compatibili (entro $1\sigma$!) con il valore atteso per $\beta \gg 1$.
 
     \begin{figure}[p]
         \centering
@@ -332,11 +332,11 @@
     
     \subsection{Simulazione numerica}
 
-    Sono state effettuate varie simulazioni con l'algoritmo non locale, con $\beta = 5$, N = 750, 850, 950, 1000, 1100, 1200, 1300, 1400, 1500, ognuna da $10^6$ misure, una ogni 10 spazzate. Sono state scartate le prime $2 \cdot 10^5$ misure per termalizzazione.
+    Sono state effettuate varie simulazioni con l'algoritmo non locale, con $\beta = 5$, N = 750, 850, 950, 1000, 1100, 1200, 1300, 1400, 1500, ognuna da $10^6$ misure, una ogni 10 spazzate. Sono state scartate le prime $2 \cdot 10^5$ misure per termalizzazione. 
     
-    Per ogni N, è stato stimato il gap di energia $\Delta E_1(N)$ con un fit numerico all'equazione \ref{eqn:correlator}, per $\tau < 0.1$. Questo è possibile perché gli elementi di matrice $\bra{0}\cos 2\pi x \ket{n}$ sono proporzionali a $\delta_{0n}$. Se non fosse stato così, sarebbe stato necessario studiare il comportamento asintotico del correlatore (lontano da 0 e da $\beta$).
+    Per ogni N, è stato stimato il gap di energia $\Delta E_1(N)$ con un fit numerico all'equazione \ref{eqn:correlator}, per $\tau < 0.1$. Questo è possibile perché $\cos 2\pi x$ connette lo stato fondamentale solo con il primo livello eccitato. Se non fosse stato così, sarebbe stato necessario studiare il comportamento asintotico del correlatore (lontano da 0 e da $\beta$).
     
-    Gli errori su $\Delta E_1(N)$ sono stati stimati con un algoritmo Bootstrap a 100 campioni, con blocchi di dimensione $10^3$.
+    Gli errori su $\Delta E_1(N)$ sono stati stimati con un algoritmo Bootstrap a 100 campioni, con blocchi di dimensione $10^3$. In linea di principio, bisognerebbe studiare la stima dell'errore al variare delle dimensioni del blocco e del numero di campioni. A causa di limitazioni tecniche\footnote{Un banco di RAM ha misteriosamente smesso di funzionare}, questo non è stato possibile in modo rigoroso. Tuttavia, alcuni tentativi poco costosi dal punto di vista computazionale hanno mostrato che l'errore non varia in maniera sostanziale per blocchi di dimensione $10^3$ --- $10^4$ per $N = 850$.
     
     In figura \ref{fig:energy_continuum} è riportata l'analisi del limite al continuo dell'energia del primo livello $\Delta E_1$. Il fit numerico ad una funzione $\Delta E_1(\eta) = \Delta E_1 + k\eta^2$ fornisce un valore $\Delta E_1 = 19.742(20)$, da confrontare con il valore teorico $\Delta E_1 = 2\pi^2 \simeq 19.739\dots$. 
     
