@@ -30,8 +30,8 @@ class Scalar1D {
     double M2Phi2() const;
     double xdPhi2() const;
     double tdPhi2() const;
-    double Energy();
-    double TraceAnomaly();
+    // Correlators
+    double FTCorrelator(unsigned int, double, double) const;
     // Markov steps
     void HeatbathSweep();
     void OverrelaxationSweep();

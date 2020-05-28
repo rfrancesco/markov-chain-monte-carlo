@@ -3,6 +3,8 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <complex>
+using std::complex;
 
 extern Ran2 ran;
 
@@ -63,7 +65,6 @@ double& Scalar1D::operator()(unsigned int x, unsigned int t) {
 }
 
 // Measurements
-
 double Scalar1D::M2Phi2() const {
     return m2phi2;
 }
@@ -91,8 +92,26 @@ void Scalar1D::CalculateObservables() {
     xdphi2 /= Nx * Nt;
 }
 
-// Markov steps
+// Correlators
+double Scalar1D::FTCorrelator(unsigned int k, double p, double q) const {
+    complex<double> result = 0;
+    unsigned int t0 = 0;
+    unsigned int tk = k;
+    for (t0 = 0; t0 < Nt; ++t0) {
+        complex<double> ftx = 0;
+        complex<double> fty = 0;
+        for (unsigned int x = 0; x < Nx; ++x) {
+            ftx += std::polar(1., -q*x) * lattice[x][tk];
+            fty += std::polar(1., p*x) * lattice[x][t0];
+        }
+        result += ftx * fty / static_cast<double>(Nx);
+        tk = tnext[tk];
+    }
+    result /= Nt;
+    return abs(result);
+}
 
+// Markov steps
 double Scalar1D::Force(unsigned int x, unsigned int t) const {
     double f = lattice[x][tnext[t]] + lattice[x][tprev[t]];
     f += lattice[xnext[x]][t] + lattice[xprev[x]][t];
