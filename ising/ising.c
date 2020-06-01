@@ -3,8 +3,14 @@
 #include <math.h>
 #include "../rng/ran2.c"
 
+// In case of emergency
+void ungracefully_handle_memory_issues() {
+    printf("Fatal error: Memory allocation failure.\n");
+    fprintf(stderr, "Fatal error: Memory allocation failure.\n");
+    exit(EXIT_FAILURE);
+}
 
-
+// Generate random ±1 spin
 short random_spin() {
     double x = ran2();
     if (x > 0.5)
@@ -13,6 +19,7 @@ short random_spin() {
         return -1;
 }
 
+// Lattice struct
 typedef struct lattice_s {
     short ** matrix;
     unsigned int * next;
@@ -20,12 +27,7 @@ typedef struct lattice_s {
     unsigned int size;
 } lattice_t;
 
-void ungracefully_handle_memory_issues() {
-    printf("Fatal error: Memory allocation failure.\n");
-    fprintf(stderr, "Fatal error: Memory allocation failure.\n");
-    exit(EXIT_FAILURE);
-}
-
+// Matrix constructor/destructor
 short ** create_matrix(unsigned int l) {
     short ** matrix = malloc(l * sizeof(short*));
     if (!matrix)
@@ -45,6 +47,7 @@ void free_matrix(short ** matrix, unsigned int l) {
     free(matrix);
 }
 
+// Lattice constructor/destructor
 lattice_t * create_lattice(unsigned int l) {
     lattice_t * lat = malloc(sizeof(lattice_t));
     lat->matrix = create_matrix(l);
@@ -69,6 +72,7 @@ void free_lattice(lattice_t * lat) {
     free(lat);
 }
 
+// Initialize lattice: cold/hot start
 void initialize_lattice(lattice_t * lat, unsigned int init) {
     unsigned int i, j;
     switch (init) {
@@ -97,11 +101,12 @@ void initialize_lattice(lattice_t * lat, unsigned int init) {
     }
 }*/
 
-int mod(int a, int b) {		// C % is remainder, not modulus
+int mod(int a, int b) {		// C % is remainder, not modulus 
     int r = a % b;
     return r < 0 ? r + b : r;
 }
 
+// Metropolis algorithm implementation
 double force(lattice_t * lat, unsigned int i, unsigned int j) {
     // Using mod() is convenient but wastes time (~15%)
     // A lookup table would be a more efficient approach (see ising.cpp)
@@ -132,6 +137,7 @@ void metropolis(lattice_t * lat, double beta, double extfield, unsigned long int
     }
 }
 
+// Observables
 double energy(lattice_t * lat) {
     double e = 0;
     unsigned int i,j;
