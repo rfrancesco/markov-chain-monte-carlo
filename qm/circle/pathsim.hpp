@@ -30,7 +30,7 @@ class PathSim {
         double cos_correlator(unsigned int) const;
         double cos2_avg() const;
         double cos2_correlator(unsigned int) const;
-        // Markov steps - Choose your weapon!
+        // Markov steps
         int MetropolisSweep(double, double);
         int TailorStep(double);
 };

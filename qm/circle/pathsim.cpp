@@ -81,7 +81,7 @@ double PathSim::slab_winding(unsigned int stop) const {
 
 double PathSim::cos_avg() const {
     double result = 0;
-    // Calculate <x^2> as average over entire path
+    // Average over entire path
     for (unsigned int i = 0; i < size; ++i)
         result += cos(2*M_PI*p[i]);
     result /= size;
@@ -103,7 +103,7 @@ double PathSim::cos_correlator(unsigned int k) const {
 
 double PathSim::cos2_avg() const {
     double result = 0;
-    // Calculate <x^2> as average over entire path
+    // Average over entire path
     for (unsigned int i = 0; i < size; ++i)
         result += cos(4*M_PI*p[i]);
     result /= size;
