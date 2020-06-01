@@ -13,14 +13,16 @@ Ran2 ran(urandom());
 
 int main(int argc, char** argv) {
 
-    if (argc != 5) {
-        cout << "Usage: 4 arguments: Nx, Nt, m, n_measures" << endl;
+    if (argc != 7) {
+        cout << "Usage: 6 arguments: Nx, Nt, m, n_measures, p, q" << endl;
         return EXIT_FAILURE;
     }
     const unsigned int Nx = atoi(argv[1]);
     const unsigned int Nt = atoi(argv[2]);
     const double m = atof(argv[3]);
     const unsigned long int n_measures = atoi(argv[4]);
+    const double p = atof(argv[5]);
+    const double q = atof(argv[6]);
 
     cout << "#Simulation of (Nx, Nt) = " << Nx << ", " << Nt << ") with mass" << m << endl;
     cout << "#Taking " << n_measures << "  measures every HB+4OR" << endl;
@@ -33,8 +35,8 @@ int main(int argc, char** argv) {
         field->OverrelaxationSweep();
         field->OverrelaxationSweep();
         field->OverrelaxationSweep();
-        for (unsigned int k = 0; k < Nt/2; ++k) {
-            cout << field->FTCorrelator(k, 0, 0) << "\t";
+        for (unsigned int k = 0; k < Nt; ++k) {
+            cout << field->FTCorrelator(k, p, q) << "\t";
         }
         cout << endl;
     }

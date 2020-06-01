@@ -14,7 +14,7 @@ Scalar1D::Scalar1D(unsigned int Nx, unsigned int Nt, double mass) {
     this->mass = mass;
     mass2 = mass * mass;
     m2p4 = mass2 + 4;
-    // Ignoring memory issues for now
+    // Ignoring memory checks for now
     lattice = new double*[Nx];
     for (unsigned int x = 0; x < Nx; ++x)
         lattice[x] = new double[Nt];
@@ -37,10 +37,10 @@ Scalar1D::Scalar1D(unsigned int Nx, unsigned int Nt, double mass) {
     }
     tnext[Nt - 1] = 0;
     tprev[0] = Nt - 1;
-    // Initialization to zero
+    // Lattice initialization to zero
     for (unsigned int x = 0; x < Nx; ++x)
         for (unsigned int t = 0; t < Nt; ++t)
-            lattice[x][t] = ran.doub();
+            lattice[x][t] = 0;
 }
 
 Scalar1D::~Scalar1D() {

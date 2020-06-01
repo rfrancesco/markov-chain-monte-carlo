@@ -37,4 +37,7 @@ int main(int argc, char** argv) {
         cout << field->M2Phi2() << "\t" << field->xdPhi2() << "\t" << field->tdPhi2() << endl;
     }
 
+    cout << "#Simulation finished" << endl;
+    return 0;
+
 }
