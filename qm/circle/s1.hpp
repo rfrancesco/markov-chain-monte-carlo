@@ -5,7 +5,7 @@
 class S1 {
     private:
         double x;
-        void wrap();
+        void wrap(); // Wraps x around the unit circle
     public:
 	// Constructor / Destructor
         S1() :x{0} {}
