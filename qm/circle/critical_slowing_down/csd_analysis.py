@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 '''Analysis of the critical slowing down
-   Plotting (1/Î , t_int). '''
+   Plotting (1/eta, t_int). '''
 
 Netas = [5, 10, 15]
 algs = ["local", "tailor"]
