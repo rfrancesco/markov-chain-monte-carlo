@@ -19,7 +19,7 @@ Quantum Mechanics, QFT (work in progress)
       Contains various algorithms, to study and address the
       exponential critical slowing down for η -> 0, in the β >> 1 regime,
       and to study the spectrum of the Hamiltonian.
-- qft/
+- qft/   
   (C++) 1+1D Scalar quantum field
   Contains tools to study the thermodynamics and the spectrum of the field,
   by using wall-wall correlators.
