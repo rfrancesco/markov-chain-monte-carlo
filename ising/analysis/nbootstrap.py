@@ -3,6 +3,7 @@
 """
 Created on Tue Mar 24 20:05:52 2020
 
+Generates Bootstrap data, to be analyzed with nplotbootstrap.py
 """
 import matplotlib.pyplot as plt
 import numpy as np

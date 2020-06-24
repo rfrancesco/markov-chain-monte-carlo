@@ -2,12 +2,11 @@ import numpy as np
 import random as ran
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from numba import njit
 
 # Numba does not support arguments in np.var(), np.std()
 # Therefore, var() and std() are equivalent to np.var(ddof=1) and np.std(ddof=1)
+# (njit disabled in the code)
 
-@njit
 def var(data):
     '''Numba-friendly shorthand for np.var(data, ddof=1).
     Estimator for the variance of a data set'''
@@ -15,24 +14,22 @@ def var(data):
     return data.var() * n/(n-1)
 
 
-@njit
 def mean_var(data):
     '''Variance of the mean of a data set'''
     return var(data) / data.size
 
-@njit
 def std(data):
     '''Numba-friendly shorthand for np.std(data, ddof=1).
     Estimator for the standard deviation of a data set'''
     return np.sqrt(var(data))
 
-@njit
 def mean_std(data):
     '''Standard deviation of the mean of a data set'''
     return np.sqrt(mean_var(data))
 
 
-@njit
+# Blocking error estimation utilities
+
 def halve(data):
     '''halve(numpy.ndarray 1D x): (x[i]) -> (y[i] = (x[2i] + x[2i+1])/2)
     y.size = x.size // 2
@@ -45,9 +42,6 @@ def halve(data):
     s = s // 2
     return w.reshape(s, 2).sum(axis=1) / 2
 
-
-
-@njit
 def blocking(data):
     '''Blocking analysis for data with autocorrelation
     Estimator for the standard deviation of the mean'''
@@ -59,7 +53,6 @@ def blocking(data):
         x = halve(x)
     return b 
 
-@njit
 def varblocking(data):
     '''Blocking analysis for data with autocorrelation
     Estimator for the variance of the mean'''
@@ -90,7 +83,8 @@ def binder(data):
     return d
 
 
-@njit
+# Bootstrap error estimation utilities
+
 def bootstrap_var(data, blocksize, n_samples):
     '''Calculates the statistical error (std) on the variance of
     a 1D array with the Bootstrap algorithm.'''
@@ -126,6 +120,7 @@ def bootstrap_var_blocking(data, n_samples):
     b = [bootstrap_var(x, 2**i, n_samples) for i in tqdm(range(1, b_max))]
     return np.asarray(b)
 
+# Data autocorrelation utilities
 
 def autocorr(data):
     '''Returns statistical autocorrelation of a 1D array'''
@@ -153,6 +148,8 @@ def thermal(f, data, xmax, step=10, **kwargs):
         for i in range(0, xmax // step):
             measure.append(f(data[step*i:], *params))
     return np.asarray(measure)
+
+# Rounding utilities
 
 def order(x):
     '''Gets order of magnitude exponent of x (x ~ 10**order(x))'''
