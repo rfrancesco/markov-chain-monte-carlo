@@ -2,9 +2,6 @@
 
 
 - harmonic.c: Quantum harmonic oscillator.
-  - TODO
-    - [ ] Prev/Next lookup arrays
-    - [x] Measure correlation functions <x(0)x(τ)>
     
    
 - circle/: Quantum free particle on a 1D circle  
@@ -13,6 +10,8 @@
     - The engine of these simulations
     - Measurements implemented as public functions
     - MCMC algorithms implemented as public functions
+    - With some minor tweaks to the code I will eventually make, it is easily composable
+      to implement parallel algorithms such as Parallel Tempering
   - s1.hpp/cpp: C++ data type implementing the circle group S1  
     Features:
     - Double precision
