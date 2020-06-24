@@ -19,7 +19,7 @@
 \newcommand{\chindof}{\chi^2 / \text{ndof}}
 
 %opening
-\title{Studio numerico della termodinamica del campo scalare reale in 1+1D}
+\title{Campo scalare reale in 1+1D: Termodinamica e misura della massa}
 \author{Rocco Francesco Basta}
 \date{}
 
@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-    Scopo di questo progetto è lo studio della termodinamica di un campo scalare reale in 1+1 dimensioni. Confronteremo due metodi per calcolare l'energia interna e la pressione del sistema: uno diretto, ottenuto facendo le opportune derivate della funzione di partizione, e uno indiretto, basato sull'integrazione numerica dell'anomalia di traccia.
+    Scopo di questo progetto è lo studio della termodinamica di un campo scalare reale in 1+1 dimensioni. Confronteremo due metodi per calcolare l'energia interna e la pressione del sistema: uno diretto, ottenuto facendo le opportune derivate della funzione di partizione, e uno indiretto, basato sull'integrazione numerica dell'anomalia di traccia. Infine, è stata studiata la funzione di correlazione della trasformata di Fourier del campo per misurare la massa.
 \end{abstract}
 
 \section{Introduzione al sistema}
@@ -53,7 +53,7 @@
         \avg{O}_\beta = \frac{1}{Z} \int \mathcal{D} \phi \, O[\phi] e^{-S_E[\phi]}
     \end{equation}
     %
-    Nella simulazione, si introduce una discretizzazione su un reticolo cubico $(N_s, N_\tau)$ con passo reticolare $a$ e un volume spaziale finito $V$\footnote{Nel caso 1+1D è la lunghezza della scatola in cui è contenuto il sistema.}. Definendo il parametro $\hat{m} \equiv ma$, il limite del continuo si ottiene facendo il limite
+    Nella simulazione, si introduce una discretizzazione su un reticolo cubico $(N_s, N_\tau)$ con passo reticolare $a$ e un volume spaziale finito $V$\footnote{Nel caso 1+1D è la lunghezza della scatola in cui è contenuto il sistema.}, con condizioni periodiche al bordo. Definendo il parametro $\hat{m} \equiv ma$, il limite del continuo si ottiene facendo il limite
     %
     \begin{subequations}
         \begin{equation}
@@ -144,7 +144,7 @@
     
     \section{Simulazioni numeriche}
     
-    Sono state effettuate delle simulazioni con l'algoritmo Heatbath combinato con 4 spazzate di Overrelaxation con $N_s$ = 100, 150, 200, 250 e rispettivamente $\hat{m} = 0.1, 1/15, 0.05, 0.04$. Per ogni coppia ($N_s, \hat{m}$), sono state effettuate 14 simulazioni a diversi valori di $T/m$. 
+    Sono state effettuate delle simulazioni con l'algoritmo Heatbath combinato con 4 spazzate di Overrelaxation con $N_s$ = 100, 150, 200, 250 e rispettivamente $\hat{m} = 0.1, 1/15, 0.05, 0.04$. Per ogni coppia ($N_s, \hat{m}$), sono state effettuate 14 simulazioni a diversi valori di $T/m$. Per eliminare divergenze, ad ogni osservabile è stato sottratto il valore per $N_s = N_\tau$.
     
     Successivamente, è stato effettuato il limite al continuo delle osservabili (densità di energia, pressione, anomalia di traccia) per ogni valore di $T/m$. 
     
@@ -156,7 +156,7 @@
     
     Con questa stima, le quantità ottenute dall'integrazione numerica sono compatibili con quelle ottenute direttamente derivando la funzione di partizione. La densità di energia sembra tendere come previsto a $\pi / 6$ a grandi temperature. 
     
-    Un modo per analizzare il sistematico in modo più accurato potrebbe essere il seguente: dato che l'errore commesso sul singolo intervallo con il metodo dei trapezi è, al prim'ordine non nullo, $\propto \Delta^2$, si potrebbe fare altre simulazioni, con una ``griglia'' più fitta in $T/m$, ed estrapolare il limite al continuo eseguendo un fit con $f(\Delta) = \hat{f} + a \Delta^2$.
+    Un modo per analizzare il sistematico in modo più accurato potrebbe essere il seguente: dato che l'errore commesso sul singolo intervallo con il metodo dei trapezi è, al prim'ordine non nullo, $\propto \Delta^3$, si potrebbe fare altre simulazioni, con una ``griglia'' più fitta in $T/m$, ed estrapolare il limite al continuo eseguendo un fit con $f(\Delta) = f + k \Delta^3$.
     
     \begin{figure}[htb]
         \centering
@@ -190,9 +190,6 @@
     
     Questo correlatore è atteso essere nullo per $p \neq q$, e a basse temperature ha un andamento proporzionale a $\exp (- E_p \tau)$, dove $E_p$ è l'energia della particella con impulso $p$.
     
-    Ponendo $p = q = 0$, si ha che $C(\tau, 0, 0) \propto \exp (-m\tau)$. Possiamo quindi sfruttarlo per misurare la massa del campo scalare.
-    
-    Le simulazioni sono state eseguite per $N_s = N_\tau \equiv N =$ 40, 50, 80, 100, 125, e rispettivamente $\hat{m} = $ 0.25, 0.20, 0.125, 0.1, 0.08, in modo da verificare le condizioni $\beta m = 10, V=10$.
     
     \begin{wraptable}{r}{4.5cm}
         \begin{tabular}{c c} \hline
@@ -209,6 +206,9 @@
     \end{wraptable}
     
 
+    Ponendo $p = q = 0$, si ha che $C(\tau, 0, 0) \propto \exp (-m\tau)$. Possiamo quindi sfruttarlo per misurare la massa del campo scalare.
+    
+    Le simulazioni sono state eseguite per $N_s = N_\tau \equiv N =$ 40, 50, 80, 100, 125, e rispettivamente $\hat{m} = $ 0.25, 0.20, 0.125, 0.1, 0.08, in modo da verificare le condizioni $\beta m = 10, V=10$.
     
     Per ogni simulazione, sono state prese 125000 misure, e sono state scartate le prime 50000 per termalizzazione. Gli errori sul correlatore sono stati stimati con l'usuale metodo di blocking.
     
@@ -234,7 +234,7 @@
         \label{fig:mass_fit}
     \end{figure}
     
-    Per ogni simulazione, è stato eseguito un fit numerico del correlatore alla funzione $C(\tau) = a \exp (-m_N\tau)$. L'errore su $m_N$ è stato stimato con un algoritmo Bootstrap. Infine, è stato eseguito un fit numerico alla funzione $m(\hat{m}) = a + b \hat{m}^2$ per estrarre il limite del continuo.
+    Per ogni simulazione, è stato eseguito un fit numerico del correlatore alla funzione $C(\tau) = A \exp (-m_N\tau)$. L'errore su $m_N$ è stato stimato con un algoritmo Bootstrap. Infine, è stato eseguito un fit numerico alla funzione $m(\hat{m}) = m + k \hat{m}^2$ per estrarre il limite del continuo.
     
     Il risultato, riportato in tabella (\ref{tab:mass_fit}) e in figura (\ref{fig:mass_fit}), è in ottimo accordo con quanto previsto, con un $\chindof \simeq 0.15$, che è un po' basso, ed indica una possibile sovrastima degli errori.
     
