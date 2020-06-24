@@ -58,13 +58,13 @@
     %
     dove $\hat{\beta} = \beta / mL^2 = \frac{1/mL^2}{kT}$ è il rapporto fra la scala di energia caratteristica del sistema (a meno di costanti) e la scala di energia termica.
     
-    Analogamente, possiamo scrivere l'azione euclidea per studiarne la termodinamica:
+    Analogamente, possiamo scrivere l'azione euclidea:
     %
     \begin{equation}
         S_E = \int_0^\beta d\tau \, \frac{1}{2} m \left(\frac{dx}{d\tau}\right)^2 = \int_0^{\hat{\beta}} d\tau \, \frac{1}{2} \left( \frac{d\hat{x}}{d\tau}\right)^2
     \end{equation}
     %
-    La funzione di partizione è data dall'integrale sui cammini chiusi $\hat{x}(\tau): [0, \hat{\beta}] \to [-1/2, 1/2)$:
+    Possiamo quindi riscrivere la funzione di partizione in termini dell'integrale sui cammini chiusi $\hat{x}(\tau): [0, \hat{\beta}] \to [-1/2, 1/2)$:
     
     \begin{equation}
         Z = \mathcal{N} \int_{\hat{x}(0) = \hat{x}(\hat{\beta})} \mathcal{D}\hat{x}(\tau) \, \,e^{-S_E}
@@ -142,7 +142,7 @@
     
     Il primo algoritmo utilizzato è un semplice algoritmo Metropolis in cui ogni sito viene aggiornato, sequenzialmente, spostandolo in una posizione $x_i \to x^P_i \in [x - \delta, x + \delta]$.
     
-    Come verificheremo esplicitamente, nel limite del continuo questo algoritmo ha difficoltà a passare da un cammino con carica topologica $Q$ ad un altro con carica $Q' \neq Q$. Questo porta a un congelamento dei modi topologici, e a un aumento esponenziale dei tempi di autocorrelazione associati alla carica topologica (\emph{critical slowing down esponenziale}).
+    Come vedremo, nel limite del continuo questo algoritmo ha difficoltà a passare da un cammino con carica topologica $Q$ ad un altro con carica $Q' \neq Q$. Questo porta a un congelamento dei modi topologici, e a un aumento esponenziale dei tempi di autocorrelazione associati alla carica topologica (\emph{critical slowing down esponenziale}).
     
     \begin{algorithm}[H]
     Cammino x[N]\;
@@ -190,13 +190,13 @@
     
     L'idea è quella di considerare la carica topologica $Q_x$ calcolata non su tutto il cammino $[0, \beta]$, ma su una frazione $[0, x\beta]$, con $x \in [0,1]$. In generale, $Q_x \not\in \mathbb{Z}$ .
     
-    Se l'algoritmo locale è congelato sul modo $Q = 0$, allora 
+    Se l'algoritmo locale è congelato sul modo $Q = 0$, allora la probabilità di avere un certo valore di $Q_x$ è
     
     \begin{equation}
-        p_x (Q_x) \times p_{1-x} (- Q_x) = \text{cost.}
+        p_x (Q_x) \times p_{1-x} (- Q_x) 
     \end{equation}
 
-    Se la distribuzione $p_x (Q_x)$ è gaussiana, si può mostrare che, con $\chi_x \equiv \avg{Q^2}/\beta$, 
+    Se la distribuzione $p_x (Q_x)$ è gaussiana, si può mostrare che, con $\chi_x \equiv \avg{Q_x^2}/\beta$, 
     
     \begin{equation}
         \chi_x = x(1-x) \chi
@@ -207,7 +207,7 @@
     
     \section{Simulazioni numeriche}
     
-    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale, con condizioni iniziali fissate a 0. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è \code{RAN2}\footnote{In particolare, è una variante adattata a generare \code{double}, estratta dal codice di Athena++, Princeton University, disponibile all'indirizzo \url{https://github.com/PrincetonUniversity/athena-public-version/blob/master/src/utils/ran2.cpp}, lievemente riadattata per sfruttare alcune caratteristiche del C++.}. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
+    Sono state effettuate alcune simulazioni con $\beta = 5, 10, 15$, $N$ compreso tra 100 e 1500, usando l'algoritmo locale e quello non locale, con condizioni iniziali fissate a 0. Per ogni simulazione, sono state prese $10^6$ misure, una ogni $10$ spazzate. Le prime $10^5$ sono state scartate per termalizzazione. Il generatore di numeri pseudo-casuali utilizzato è \code{RAN2}\footnote{In particolare, è una variante adattata a generare \code{double}, estratta dal codice di Athena++, Princeton University, disponibile all'indirizzo \url{https://github.com/PrincetonUniversity/athena-public-version/blob/master/src/utils/ran2.cpp}, con un'interfaccia lievemente riadattata.}. Si è avuta particolare cura nell'effettuare le simulazioni con seed diversi, in modo da avere simulazioni indipendenti.
     
     Il tempo di autocorrelazione $\tau_\chi$ è stato determinato confrontando la stima dell'errore \emph{naïve}, ottenuta trascurando l'autocorrelazione dei dati, con quella ottenuta dal blocking. Ricordiamo che
     

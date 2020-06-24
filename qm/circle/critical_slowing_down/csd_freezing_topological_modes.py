@@ -3,6 +3,7 @@
 """
 Created on Tue Mar 24 20:05:52 2020
 
+Shows freezing of the topological modes for Î -> 0 by plotting MC histories
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,11 +37,6 @@ plt.figure(1)
 plt.title(f'Storia Montecarlo: $N\\eta = {Neta}$, {algoritmo.get(folder, "errore")}')
 plt.xlabel('Misure (1 ogni 10 spazzate)')
 plt.ylabel('Q')
-
-#plt.xlim(500000,510000)
-
-#csd_cycler = cycler(color=['b','y','r','m','k'])
-#plt.rc('axes', prop_cycle=csd_cycler)
 
 for N in tqdm(Ns):
     q = np.loadtxt(f'out_{folder}/{Neta}/{N}')

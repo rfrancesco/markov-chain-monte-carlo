@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import os
 
+"""Fit of χ_x to the model function χ *x*(1-x)
+   in order to extract the topological susceptibility from slab analysis"""
+
 
 def slab_fit(Neta, N, i):
     X, chi, dchi = np.loadtxt(f"blocking_out_slab/{Neta}/{N}", unpack=True)
