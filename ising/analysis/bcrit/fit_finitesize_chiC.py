@@ -4,9 +4,6 @@ from tqdm import tqdm
 import os
 import linefit_library as ls
 
-Ls = [20,30, 40, 50, 60]
-Ls = np.array(Ls)
-
 betas = []
 ms = []
 dms = []
@@ -31,7 +28,7 @@ dchi = dchi * N**2
 
 
 # bellurie
-plt.rc('font',size=13)
+plt.rc('font',size=15)
 plt.tight_layout()
 plt.minorticks_on()
 
@@ -55,8 +52,8 @@ pars, dpars, covm, chisquare = ls.linear(logN, logchi, dlogchi)
 def chif(x, a, b):
     return x**a * np.exp(b)
 
-#xmin = 0.003
-#xmax = 0.1
+xmin = N.min() * 0.9
+xmax = N.max() * 1.1
 plt.figure(1)
 plt.subplot2grid((4, 1), (0, 0), rowspan=3)
 plt.tick_params(labelbottom=False)
@@ -65,7 +62,7 @@ plt.xlabel('$N')
 plt.ylabel('$\\chi$')
 plt.xscale('log')
 plt.yscale('log')
-#plt.xlim(xmin, xmax)
+plt.xlim(xmin, xmax)
 
 plt.errorbar(N, chi, dchi, label='', linestyle=' ', capsize=3)
     
@@ -79,14 +76,14 @@ plt.ylabel('Residui')
 plt.xlabel('$N$')
 plt.xscale('log')
 plt.yscale('linear')
-#plt.xlim(xmin, xmax)
-plt.ylim(-1,1)
+plt.xlim(xmin, xmax)
+plt.ylim(-2,2)
 plt.plot(N, (np.log(chi) - np.log(chif(N, *pars)))*chi/dchi, linestyle=' ', marker='o')
-plt.subplots_adjust(hspace=0.14) # do not touch
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.1) # do not touch
 
-plt.savefig('chi_fs_fit.pdf')
-plt.show()
-'''
+plt.savefig('../../relazione/figure/chi_fs_fit.pdf')
+
 ########## CALORE SPECIFICO
 
 
@@ -94,53 +91,47 @@ plt.show()
 
     
 ### FIT
-C = Cs[-1]
-dC = dCs[-1]
-beta = betas[-1]
-mask = np.logical_and(((beta - bc) > 0.008), ((beta - bc) < 0.6))
+C = C
+dC = dC
+logN = (np.log(N))
 
-C = C[mask]
-dC = dC[mask]
-logbbc = (np.log(beta - bc))[mask]
-
-pars, dpars, covm, chisquare = ls.linear(logbbc, C, dC)
+pars, dpars, covm, chisquare = ls.linear(logN, C, dC)
 
 
 def Cf(x, a, b):
     return a*np.log(x) * b
 
-xmin = 0.003
-xmax = 0.1
 plt.figure(2)
 plt.subplot2grid((4, 1), (0, 0), rowspan=3)
 plt.tick_params(labelbottom=False)
-plt.title('Capacità termica per L = 60')
+plt.title('Calore specifico a $\\beta_c$')
 plt.ylabel('C')
 plt.xscale('log')
 plt.yscale('linear')
 plt.xlim(xmin, xmax)
 
-for beta, C, dC, L in zip(betas, Cs, dCs, Ls):
-    plt.errorbar(beta - bc, C, dC, label='L = %s' % L, linestyle=' ', capsize=3)
+plt.errorbar(N, C, dC, linestyle=' ', capsize=3)
 
-bb = np.linspace(0.003,betas[-1].max() - bc, 1000)
-plt.plot(bb, pars[0]*np.log(bb) + pars[1], label='fit L = 60')
+bb = np.linspace(0.8*N.min(),1.2*N.max(), 1000)
+plt.plot(bb, pars[0]*np.log(bb) + pars[1], label='fit')
 
 plt.legend()
 
 plt.subplot2grid((4,1),(3,0))
 plt.ylabel('Residui')
-plt.xlabel('$\\beta - \\beta_c$')
+plt.xlabel('$N$')
 plt.xscale('log')
 plt.yscale('linear')
 plt.xlim(xmin, xmax)
-plt.ylim(-1,1)
+plt.ylim(-2,2)
 
-plt.plot(beta[mask] - bc, (C[mask] - pars[0]*np.log(beta[mask]-bc) - pars[1])/dC[mask], linestyle=' ', marker='o')
+plt.plot(N, (C - pars[0]*np.log(N) - pars[1])/dC, linestyle=' ', marker='o')
 
-plt.subplots_adjust(hspace=0.14) # do not touch
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.1) # do not touch
 
-plt.savefig('C_fit.pdf')
+plt.savefig('../../relazione/figure/C_fs_fit.pdf')
+
 
 plt.show()
-'''
+

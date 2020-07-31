@@ -51,23 +51,21 @@ pars, dpars, covm, chisquare = ls.linear(logN, logm, dlogm)
 def chif(x, a, b):
     return x**a * np.exp(b)
 
-#xmin = 0.003
-#xmax = 0.1
+xmin = N.min() * 0.9
+xmax = N.max() * 1.1
+
 plt.figure(1)
 plt.subplot2grid((4, 1), (0, 0), rowspan=3)
 plt.tick_params(labelbottom=False)
 plt.title('Magnetizzazione a $\\beta_c$')
-plt.xlabel('$N')
 plt.ylabel('$M$')
 plt.xscale('log')
 plt.yscale('log')
-#plt.xlim(xmin, xmax)
+plt.xlim(xmin, xmax)
+bb = np.linspace(xmin,xmax, 1000)
 
-plt.errorbar(N, m, dm, label='', linestyle=' ', capsize=3)
-    
-bb = np.linspace(0.8*N.min(),1.2*N.max(), 1000)
+plt.errorbar(N, m, dm, label='', linestyle=' ')
 plt.plot(N, chif(N, *pars), label='fit')
-plt.legend()
 
 
 plt.subplot2grid((4,1),(3,0))
@@ -75,12 +73,12 @@ plt.ylabel('Residui')
 plt.xlabel('$N$')
 plt.xscale('log')
 plt.yscale('linear')
-#plt.xlim(xmin, xmax)
-plt.ylim(-1,1)
+plt.xlim(xmin, xmax)
+plt.ylim(-2,2)
 plt.plot(N, (np.log(m) - np.log(chif(N, *pars)))*m/dm, linestyle=' ', marker='o')
-plt.subplots_adjust(hspace=0.14) # do not touch
 
-plt.savefig('m_fs_fit.pdf')
+plt.subplots_adjust(hspace=0.14)
+plt.savefig('../../relazione/figure/m_fs_fit.pdf')
 plt.show()
 '''
 ########## CALORE SPECIFICO
