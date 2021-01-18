@@ -3,9 +3,11 @@ Implementation of Markov Chain Monte Carlo algorithms for Statistical Physics,
 Quantum Mechanics, QFT.
 
 The Python analysis scripts included are unorganized and incomplete. 
-I will eventually clean them up, as some of them (Bootstrap estimation of best-fit uncertainties) may be useful.
+I will eventually clean them up.
 
-Reports (in Italian) on data generated with this code, and analyzed with Python, are included under _\*/relazione/relazione_*.(tex|pdf)_.
+Reports (in Italian) on data generated with this code, and analyzed with Python, are included under `*/relazione/relazione_*.(tex|pdf)`.
+
+Plots are included in `*/relazione/figures/`.
 
 ## Contents
 - analysis/  
