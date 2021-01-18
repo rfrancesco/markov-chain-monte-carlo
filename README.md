@@ -13,8 +13,8 @@ Plots are included in `*/relazione/figures/`.
 - analysis/  
   (Python) Library for data analysis of autocorrelated data
     - analysis.py: Blocking and Bootstrap algorithm with binning with Numpy 
-    - linefit_library.py: Simple analytical linear fit (algorithm from A. G. Frodesen, O.
-   Skjeggestad, H. Tøfte, Probability and Statistics in Particle Physics)
+    - linefit_library.py: Simple analytical linear fit (algorithm from A. G. Frodesen, O. Skjeggestad, H. Tøfte, Probability and Statistics in Particle Physics)
+    - blocking_complex.py: Blocking analysis for |O_i|, with O_i complex values.
 - gaussian/  
   (C) Gaussian number generator based on the Metropolis algorithm
 - ising/   
