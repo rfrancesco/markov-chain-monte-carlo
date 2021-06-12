@@ -19,6 +19,7 @@ Plots are included in `*/relazione/figures/`.
   (C) Gaussian number generator based on the Metropolis algorithm
 - ising/   
   (C/C++) 2D Ising model simulation (Metropolis algorithm)
+  (C++) 2D N-valued Potts model, and coupled Potts lattices (Zn x Zn).
 - qm/  
   (C/C++) QM simulations
     - harmonic.c: Quantum harmonic oscillator
