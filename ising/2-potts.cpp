@@ -208,7 +208,7 @@ void Simulation::Metrostep_lattice(unsigned int lattice) {
 	double dH = - (delta[new_value][(*l)(i, jp)] + delta[new_value][(*l)(i, jm)] + delta[new_value][(*l)(ip, j)] + delta[new_value][(*l)(im, j)]) 
 	            + (delta[old_value][(*l)(i, jp)] + delta[old_value][(*l)(i, jm)] + delta[old_value][(*l)(ip, j)] + delta[old_value][(*l)(im, j)]);
 	double dH_extfield = - extfield * (delta[0][new_value] - delta[0][old_value]);
-	double dH_g = - g * (delta[other_value][new_value] - delta[other_value][new_value]);
+	double dH_g = - g * (delta[other_value][new_value] - delta[other_value][old_value]);
 
 	double dbH = beta * (dH + dH_extfield + dH_g);
 
